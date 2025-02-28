@@ -1,0 +1,21 @@
+.state-card {
+  @apply bg-slate-400 p-3   w-[40vh] min-w-[250px] rounded flex flex-col justify-between cursor-pointer hover:brightness-125;
+}
+.state-card p {
+  @apply font-bold text-white text-lg drop-shadow-[2px_2px_4px_rgba(0,0,0,0.8)];
+}
+.state-card a {
+  @apply p-1 bg-white rounded w-fit bg-white/50 text-gray-700 text-left;
+}
+.card {
+  @apply h-[40vh] w-[80vw] md:h-[370px] md:w-[40vw] lg:w-[30vw] p-3 flex flex-col items-center rounded-xl;
+}
+.card:hover {
+  @apply cursor-pointer transition-all duration-1000 hover:brightness-125 hover:scale-105;
+}
+.card h1 {
+  @apply font-bold text-3xl underline text-center;
+}
+.card p {
+  @apply text-center py-3;
+}
