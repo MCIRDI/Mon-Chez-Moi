@@ -13,14 +13,17 @@ class AuthController extends Controller
         try {
             $fields=$request->validate([
                 'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',  // Ensure email is unique
+                'email' => 'required|email|unique:users,email',
                 'password' => 'required|min:8|confirmed',
                    ]);
             $user=User::create($fields);
             $token=$user->createToken($request->name);
             return response()->json([
-                'token' => $token,
-              //  'user' => $user,
+             'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+
+             ],                'token' => $token,
             ], 201);
             } catch (\Exception $e) {
                 //if i do not add the try catch laravel dont return the errors when validating $filds
@@ -41,8 +44,12 @@ public function login(Request $request){
         }
         $token=$user->createToken($request->password);
         return response()->json([
-            'token' => $token,
-            //  'user' => $user,
+             'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+
+             ],
+             'token' => $token,
             ], 200); // 200 OK
      }catch (\Exception $e) {
             //if i do not add the try catch laravel dont return the errors when validating $filds
