@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Favorite;
 use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -24,7 +25,19 @@ class PropertyController extends Controller
             ], 500);
     }
     }
+public function  myProperties(){
+    try{
+$user_id= auth()->id();
+$properties=Property::where('id_user',$user_id)->get();
+return response()->json($properties);
 
+    }catch(\Exception $e) {
+        return response()->json([
+            'message' => 'An error occurred while retrieving properties',
+            'error' => $e->getMessage(),
+        ], 500);
+}
+}
     /**
      * Store a newly created resource in storage.
      */
@@ -154,8 +167,8 @@ class PropertyController extends Controller
     }
 
     public function getFilteredProperties(Request $request){
-    try{
 
+    try{
         $query= Property::query();
         if($request->filled('price')){
             $priceRange = $request->price;
@@ -170,7 +183,10 @@ class PropertyController extends Controller
         if($request->filled('state')){
             $query->where('state',$request->state);
         }
+
         if($request->filled('type')){
+
+
             $query->where('type',$request->type);
         }
         $properties=$query->get();
@@ -184,4 +200,79 @@ class PropertyController extends Controller
     }
     }
 
+
+
+     public function getUserFavorites()
+    {
+        $userId = auth()->id();
+        if (!$userId) {
+            return response()->json([
+                'message' => 'You must be logged in to see favorites.'
+            ], 401);
+        }
+
+        $favorites = Favorite::with('property')
+            ->where('id_user', $userId)
+            ->get();
+
+        return response()->json([
+            'favorites' => $favorites
+        ]);
+    }
+
+
+public function storeFavorites(Request $request)
+{
+    $userId = auth()->id();
+
+    if (!$userId) {
+        return response()->json([
+            'message' => 'You must be logged in to save favorites.'
+        ], 401);
+    }
+
+    $validated = $request->validate([
+        'id_property' => 'required|exists:properties,id',
+    ]);
+
+    $favorite = Favorite::firstOrCreate(
+        [
+            'id_user' => $userId,
+            'id_property' => $validated['id_property'],
+        ]
+    );
+
+    return response()->json([
+        'message' => $favorite->wasRecentlyCreated
+            ? 'Property added to favorites successfully.'
+            : 'This property is already in your favorites.',
+        'favorite' => $favorite
+    ], $favorite->wasRecentlyCreated ? 201 : 200);
+}
+public function removeFromFavorites($id)
+{
+    $userId = auth()->id();
+
+    if (!$userId) {
+        return response()->json([
+            'message' => 'You must be logged in to remove favorites.'
+        ], 401);
+    }
+
+    $favorite = Favorite::where('id_user', $userId)
+        ->where('id_property', $id)
+        ->first();
+
+    if (!$favorite) {
+        return response()->json([
+            'message' => 'This property is not in your favorites.'
+        ], 404);
+    }
+
+    $favorite->delete();
+
+    return response()->json([
+        'message' => 'Property removed from favorites successfully.'
+    ], 200);
+}
 }
