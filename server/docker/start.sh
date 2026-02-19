@@ -6,6 +6,18 @@ mkdir -p /var/lib/php/sessions
 mkdir -p /var/log/supervisor
 mkdir -p /var/run/php-fpm
 
+# Debug: Show all environment variables
+echo "=== DEBUG: Environment Variables ==="
+echo "DB_CONNECTION: ${DB_CONNECTION:-NOT_SET}"
+echo "DB_HOST: ${DB_HOST:-NOT_SET}"
+echo "DB_PORT: ${DB_PORT:-NOT_SET}"
+echo "DB_DATABASE: ${DB_DATABASE:-NOT_SET}"
+echo "DB_USERNAME: ${DB_USERNAME:-NOT_SET}"
+echo "DB_PASSWORD: ${DB_PASSWORD:+SET}"
+echo "REDIS_HOST: ${REDIS_HOST:-NOT_SET}"
+echo "REDIS_PORT: ${REDIS_PORT:-NOT_SET}"
+echo "=================================="
+
 # Set up environment variables for Laravel
 cat > /var/www/html/.env << EOF
 APP_NAME=${APP_NAME:-Laravel}
@@ -27,6 +39,11 @@ REDIS_PORT=${REDIS_PORT}
 REDIS_PASSWORD=${REDIS_PASSWORD}
 QUEUE_CONNECTION=${QUEUE_CONNECTION:-database}
 EOF
+
+# Debug: Show generated .env file
+echo "=== DEBUG: Generated .env file ==="
+cat /var/www/html/.env
+echo "================================="
 
 # Replace port in nginx config with Render's PORT
 sed -i "s/listen 8080;/listen ${PORT:-8080};/g" /etc/nginx/nginx.conf
