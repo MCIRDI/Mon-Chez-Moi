@@ -53,8 +53,7 @@ RUN docker-php-ext-install -j$(nproc) xml
 # RUN docker-php-ext-configure intl \
 #     && docker-php-ext-install -j$(nproc) intl
 
-# Enable iconv (built-in on Alpine)
-RUN docker-php-ext-enable iconv
+# iconv is already built-in to PHP on Alpine
 
 # Install and configure Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
