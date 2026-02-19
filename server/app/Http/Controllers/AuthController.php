@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 use Hash;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use App\Notifications\PasswordResetNotification;
 
 class AuthController extends Controller
 {
@@ -63,5 +66,116 @@ public function logout(Request $request)
         return response()->json([
             'message' => 'Logged out successfully',
         ], 200); // 200 OK
+}
 
-}}
+public function forgotPassword(Request $request)
+{
+    try {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+        
+        // Generate password reset token
+        $token = Str::random(60);
+        
+        // Store the token in password_resets table
+        \DB::table('password_resets')->updateOrInsert(
+            ['email' => $user->email],
+            [
+                'email' => $user->email,
+                'token' => bcrypt($token),
+                'created_at' => now()
+            ]
+        );
+
+        // Send the password reset notification
+        $user->notify(new PasswordResetNotification($token));
+        
+        return response()->json([
+            'message' => 'Password reset instructions have been sent to your email address.',
+        ], 200);
+        
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'message' => 'The provided email address was not found in our system.',
+            'errors' => $e->errors(),
+        ], 422);
+    } catch (\Exception $e) {
+        \Log::error('Password reset error: ' . $e->getMessage());
+        return response()->json([
+            'message' => 'An error occurred while processing your request.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+public function resetPassword(Request $request)
+{
+    try {
+        $request->validate([
+            'token' => 'required|string',
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        // Find the password reset record
+        $resetRecord = \DB::table('password_resets')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$resetRecord) {
+            return response()->json([
+                'message' => 'Invalid password reset token.',
+            ], 422);
+        }
+
+        // Verify the token (check against the hashed token)
+        if (!Hash::check($request->token, $resetRecord->token)) {
+            return response()->json([
+                'message' => 'Invalid password reset token.',
+            ], 422);
+        }
+
+        // Check if token has expired (default 60 minutes)
+        $expiresAt = now()->subMinutes(config('auth.passwords.users.expire', 60));
+        if ($resetRecord->created_at < $expiresAt) {
+            // Delete expired token
+            \DB::table('password_resets')
+                ->where('email', $request->email)
+                ->delete();
+            
+            return response()->json([
+                'message' => 'Password reset token has expired. Please request a new one.',
+            ], 422);
+        }
+
+        // Update the user's password
+        $user = User::where('email', $request->email)->first();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // Delete the password reset record
+        \DB::table('password_resets')
+            ->where('email', $request->email)
+            ->delete();
+        
+        return response()->json([
+            'message' => 'Password has been reset successfully.',
+        ], 200);
+        
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'message' => 'Validation failed.',
+            'errors' => $e->errors(),
+        ], 422);
+    } catch (\Exception $e) {
+        \Log::error('Password reset error: ' . $e->getMessage());
+        return response()->json([
+            'message' => 'An error occurred while resetting your password.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+}

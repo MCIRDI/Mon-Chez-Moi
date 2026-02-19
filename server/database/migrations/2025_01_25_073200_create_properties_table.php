@@ -20,9 +20,9 @@ return new class extends Migration
             $table->float('price');
             $table->string('state');
             $table->string('municipality');
-            $table->string('exact_address'); //adress inside the munipality
-            $table->integer('space');// Space in square meters
-            $table->integer('number_rooms');// Number of rooms
+            $table->string('exact_address'); 
+            $table->integer('space');
+            $table->integer('number_rooms');
             $table->integer('floor');//number of floors if it is a villa or house, and in wich  floor it is if it a apartment or shop
             $table->text('description')->nullable();
             $table->json('features')->nullable(); //(e.g., Livret foncier, Zone commerciale, Électricité, Gaz, Jardin, Chauffage central, Eau)

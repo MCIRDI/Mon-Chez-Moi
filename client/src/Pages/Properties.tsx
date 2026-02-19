@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://127.0.0.1:8000/storage";
+
 interface PropertyProps {
   property: {
     id: number;
@@ -15,9 +17,36 @@ interface PropertyProps {
     floor: number;
     description: string;
     features: string[];
+    photo1: string | null;
+    photo2: string | null;
+    photo3: string | null;
     created_at: string;
     updated_at: string;
   };
+}
+
+function formatRelativeTime(isoDate: string) {
+  const date = new Date(isoDate);
+  const diffMs = date.getTime() - Date.now();
+
+  const units: Array<[Intl.RelativeTimeFormatUnit, number]> = [
+    ["year", 1000 * 60 * 60 * 24 * 365],
+    ["month", 1000 * 60 * 60 * 24 * 30],
+    ["day", 1000 * 60 * 60 * 24],
+    ["hour", 1000 * 60 * 60],
+    ["minute", 1000 * 60],
+    ["second", 1000],
+  ];
+
+  for (const [unit, unitMs] of units) {
+    const value = diffMs / unitMs;
+    if (Math.abs(value) >= 1) {
+      const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+      return rtf.format(Math.round(value), unit);
+    }
+  }
+
+  return "just now";
 }
 
 export default function Properties({ property }: PropertyProps) {
@@ -30,9 +59,16 @@ export default function Properties({ property }: PropertyProps) {
       onClick={goToProperty}
       className="py-2 pl-1 w-[95vw] md:w-[45vw] lg:w-[32vw] flex flex-col gap-1 shadow-lg hover:cursor-pointer"
     >
-      <div className="h-[30vh] p-1 rounded bg-[url('/images/image01.jpg')] bg-cover ">
+      <div
+        className="h-[30vh] p-1 rounded bg-cover bg-center"
+        style={{
+          backgroundImage: property.photo1
+            ? `url(${API_BASE_URL}/${property.photo1})`
+            : "url('/images/image01.jpg')",
+        }}
+      >
         <p className="bg-black bg-opacity-75 p-[1px] w-fit text-white text-sm  rounded">
-          2 days ago
+          {formatRelativeTime(property.created_at)}
         </p>
       </div>
       <div className="p-1 w-[100%] ">

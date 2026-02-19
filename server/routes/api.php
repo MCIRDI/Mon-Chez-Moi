@@ -14,6 +14,8 @@ Route::get('/user', function (Request $request) {
 Route::post('/register',[AuthController::class,'register']);
 Route::post('/login',[AuthController::class,'login']);
 Route::post('/logout',[AuthController::class,'logout'])->middleware(('auth:sanctum'));
+Route::post('/forgot-password',[AuthController::class,'forgotPassword']);
+Route::post('/reset-password',[AuthController::class,'resetPassword']);
 //properties
 Route::get('/properties',[PropertyController::class,'index']);
 Route::get('/MyProperties',[PropertyController::class,'myProperties'])->middleware(('auth:sanctum'));
@@ -23,8 +25,8 @@ Route::get('/properties/filter', [PropertyController::class, 'getFilteredPropert
 
 Route::get('/properties/{id}',[PropertyController::class,'show']);
 Route::post('/properties', [PropertyController::class, 'store'])->middleware(('auth:sanctum'));//create a property
-Route::put('/properties/{id}', [PropertyController::class, 'update'])->middleware(('auth:sanctum')); // update a property
+Route::match(['put', 'post'], '/properties/{id}', [PropertyController::class, 'update'])->middleware(('auth:sanctum')); // update a property
 Route::delete('/properties/{id}', [PropertyController::class, 'destroy'])->middleware(('auth:sanctum'));//delete a property
-Route::get('/favorites', [PropertyController::class, 'getUserFavorites']);Route::post('/properties', [PropertyController::class, 'store'])->middleware(('auth:sanctum'));//create a property
+Route::get('/favorites', [PropertyController::class, 'getUserFavorites'])->middleware('auth:sanctum');
 Route::post('/storeFavorites', [PropertyController::class, 'storeFavorites'])->middleware(('auth:sanctum'));
 Route::delete('/removeFromFavorites/{id}', [PropertyController::class, 'removeFromFavorites'])->middleware('auth:sanctum');

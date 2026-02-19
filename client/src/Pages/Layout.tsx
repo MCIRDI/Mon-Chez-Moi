@@ -3,7 +3,7 @@ import Footer from "./Footer";
 import { useEffect, useState, useRef, useContext } from "react";
 import AuthenticationForms from "./Auth/AuthenticationForms";
 import { AppContext } from "@/Context/AppContext";
-import Sidebar from "@/components/sideBar";
+import Sidebar from "@/ui/sideBar";
 export default function Layout() {
   const [authForms, setAuthForms] = useState(false);
   const authFormsRef = useRef<HTMLDivElement>(null);
@@ -39,6 +39,19 @@ export default function Layout() {
       document.body.style.overflow = "auto"; // Nettoyage au démontage
     };
   }, [authForms]);
+
+  // Listen for custom event to open auth forms
+  useEffect(() => {
+    const handleOpenAuthForms = () => {
+      setAuthForms(true);
+    };
+
+    window.addEventListener('openAuthForms', handleOpenAuthForms);
+
+    return () => {
+      window.removeEventListener('openAuthForms', handleOpenAuthForms);
+    };
+  }, []);
   return (
     <div className="relative">
       <header className="absolute py-5  md:hidden ">

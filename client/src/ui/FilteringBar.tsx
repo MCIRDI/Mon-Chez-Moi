@@ -4,10 +4,10 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/ui/select";
 import { filterProperties } from "@/Services/PropetyService";
 import { useEffect, useState } from "react";
-import { Property } from "./Search";
+import { Property } from "../Pages/Search";
 import { ListFilterIcon } from "lucide-react";
 import { useParams } from "react-router-dom";
 

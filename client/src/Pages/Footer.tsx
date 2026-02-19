@@ -8,13 +8,14 @@ const Footer = () => {
         <div>
           <h2 className="text-xl font-semibold mb-4">Contact Info</h2>
           <p className="flex items-center gap-2">
-            <Mail className="w-5 h-5 text-gray-400" /> MonChezMoi@gmail.com
+            <Mail className="w-5 h-5 text-gray-400" />{" "}
+            mcirdiabdallah02@gmail.com
           </p>
           <p className="flex items-center gap-2">
-            <Phone className="w-5 h-5 text-gray-400" /> +1 415 555 1234
+            <Phone className="w-5 h-5 text-gray-400" /> +48 736 241 930
           </p>
           <p className="flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-gray-400" /> California, USA
+            <MapPin className="w-5 h-5 text-gray-400" /> Krakow, Poland
           </p>
         </div>
 

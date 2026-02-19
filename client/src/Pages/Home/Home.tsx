@@ -1,13 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
-import { Search } from "lucide-react";
-import { useState } from "react";
+import AutocompleteSearch from "@/ui/AutocompleteSearch";
+
 export default function Home() {
   const navigate = useNavigate();
-  const [query, setQuery] = useState("");
 
-  function handleSubmit(e: { preventDefault: () => void }) {
-    e.preventDefault();
+  function handleSearch(query: string) {
     if (query.trim()) {
       navigate("/Search/" + encodeURIComponent(query));
     }
@@ -28,18 +26,10 @@ export default function Home() {
           <p className="text-white font-bold text-4xl drop-shadow-[2px_2px_4px_rgba(0,0,0,0.8)]">
             find your next address
           </p>
-          <div className=" bg-white flex items-center rounded-2xl shadow-lg p-3 w-[80vw] md:w-[600px] ">
-            <Search className="text-slate-800" />
-            <form onSubmit={handleSubmit} className="flex w-full">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Enter a state from the USA"
-                className="ml-2 w-full border-none outline-none bg-transparent placeholder-slate-800"
-              />
-            </form>
-          </div>
+          <AutocompleteSearch 
+            onSearch={handleSearch}
+            className="w-[80vw] md:w-[600px]"
+          />
         </div>
       </section>
       <section className="px-4 md:px-24 pt-16 flex flex-col items-center">
@@ -55,11 +45,11 @@ export default function Home() {
       <section className="flex flex-row overflow-x-auto  scrollbar-hide ">
         <div
           onClick={() => {
-            navigate("Search/Atlanta");
+            navigate("Search/Washington");
           }}
           className="state-card ml-[2vh] h-[50vh]   min-h-[310px] bg-[url('/images/image05.jpg')] bg-cover"
         >
-          <p>Atlanta</p>
+          <p>Washington</p>
           <a>
             View Homes <span className="text-xl">&gt;</span>
           </a>
@@ -78,11 +68,11 @@ export default function Home() {
           </div>
           <div
             onClick={() => {
-              navigate("Search/Philadelphia");
+              navigate("Search/Alabama");
             }}
             className="state-card h-[24vh]  min-h-[150px] bg-[url('/images/image02.jpg')] bg-cover"
           >
-            <p>Philadelphia</p>
+            <p>Alabama</p>
             <a>
               View Homes <span className="text-xl">&gt;</span>
             </a>
@@ -173,11 +163,11 @@ export default function Home() {
         </div>
         <div
           onClick={() => {
-            navigate("Search/Washington");
+            navigate("Search/Oklahoma");
           }}
           className="state-card ml-[2vh] h-[50vh]   min-h-[310px] "
         >
-          <p>Washington</p>
+          <p>Oklahoma</p>
           <a>
             View Homes <span className="text-xl">&gt;</span>
           </a>

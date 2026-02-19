@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "@/Context/AppContext";
-import "./AuthenticationForms.css";
 import { register, login } from "@/Services/AuthService";
+import { useNavigate } from "react-router-dom";
+import "./AuthenticationForms.css";
 interface LoginProps {
   closeAuthForms: () => void;
 }
@@ -37,6 +38,8 @@ export default function AuthenticationForms({ closeAuthForms }: LoginProps) {
     password: "",
   });
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
   function handleChangeRegister(e: React.ChangeEvent<HTMLInputElement>) {
     setRegisterData({
       ...registerData,
@@ -52,6 +55,7 @@ export default function AuthenticationForms({ closeAuthForms }: LoginProps) {
     });
   }
   const appContext = useContext(AppContext);
+  const navigate = useNavigate();
   if (!appContext) {
     throw new Error("AppContext is not provided");
   }
@@ -60,27 +64,40 @@ export default function AuthenticationForms({ closeAuthForms }: LoginProps) {
 
   async function handleRegistration(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const data = await register(registerData);
-    setToken(data.token.plainTextToken);
-    setUser(data.user);
-    closeAuthForms();
-    console.log("token is :111112233", data.token.plainTextToken);
-    console.log("registered user is :111112233", data.user);
-  }
-  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+    setIsRegistering(true);
+    setErrorMessage("");
     try {
-      const data = await login(loginData);
-
+      const data = await register(registerData);
       setToken(data.token.plainTextToken);
       setUser(data.user);
       closeAuthForms();
-      console.log("token is :3333333333", data.token.plainTextToken);
-      console.log("loged in user is :3333333333", data.user);
     } catch (error: unknown) {
       if (error instanceof Error) {
         setErrorMessage(error.message);
+      } else {
+        setErrorMessage("Registration failed. Please try again.");
       }
+    } finally {
+      setIsRegistering(false);
+    }
+  }
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsLoggingIn(true);
+    setErrorMessage("");
+    try {
+      const data = await login(loginData);
+      setToken(data.token.plainTextToken);
+      setUser(data.user);
+      closeAuthForms();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("Login failed. Please try again.");
+      }
+    } finally {
+      setIsLoggingIn(false);
     }
   }
 
@@ -90,7 +107,7 @@ export default function AuthenticationForms({ closeAuthForms }: LoginProps) {
         <div className="form-container sign-up-container">
           <form onSubmit={handleRegistration} method="POST">
             <h1>Create Account</h1>
-            <div className="social-container">
+            {/* <div className="social-container">
               <a href="#" className="social">
                 <i className="fab fa-facebook-f"></i>
               </a>
@@ -100,8 +117,9 @@ export default function AuthenticationForms({ closeAuthForms }: LoginProps) {
               <a href="#" className="social">
                 <i className="fab fa-linkedin-in"></i>
               </a>
-            </div>
+            </div> 
             <span>or use your email for registration</span>
+            */}
             <input
               type="text"
               name="name"
@@ -127,13 +145,22 @@ export default function AuthenticationForms({ closeAuthForms }: LoginProps) {
               placeholder="Confirm Password"
               required
             />
-            <button type="submit">Sign Up</button>
+            <button type="submit" disabled={isRegistering} className={isRegistering ? "opacity-70 cursor-not-allowed" : ""}>
+              {isRegistering ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  Registering...
+                </span>
+              ) : (
+                "Register"
+              )}
+            </button>
           </form>
         </div>
         <div className="form-container sign-in-container">
           <form action="#" onSubmit={handleLogin} method="POST">
             <h1>Sign in</h1>
-            <div className="social-container">
+            {/* <div className="social-container">
               <a href="#" className="social">
                 <i className="fab fa-facebook-f"></i>
               </a>
@@ -144,7 +171,7 @@ export default function AuthenticationForms({ closeAuthForms }: LoginProps) {
                 <i className="fab fa-linkedin-in"></i>
               </a>
             </div>
-            <span>or use your account</span>
+            <span>or use your account</span> */}
             <p
               className={`bg-red-600 p-3 text-white ${errorMessage === "" ? "hidden" : ""}`}
             >
@@ -162,8 +189,27 @@ export default function AuthenticationForms({ closeAuthForms }: LoginProps) {
               name="password"
               placeholder="Password"
             />
-            <a href="#">Forgot your password?</a>
-            <button type="submit">Sign In</button>
+            <a 
+              href="#" 
+              onClick={(e) => {
+                e.preventDefault();
+                closeAuthForms(); // Close the floating auth forms
+                navigate("/ForgotPassword");
+              }}
+              className="text-blue-600 hover:text-blue-800 text-sm"
+            >
+              Forgot your password?
+            </a>
+            <button type="submit" disabled={isLoggingIn} className={isLoggingIn ? "opacity-70 cursor-not-allowed" : ""}>
+              {isLoggingIn ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  Signing In...
+                </span>
+              ) : (
+                "Sign In"
+              )}
+            </button>
           </form>
         </div>
         <div className="overlay-container">
@@ -181,7 +227,7 @@ export default function AuthenticationForms({ closeAuthForms }: LoginProps) {
               <h1>Hello, Friend!</h1>
               <p>Enter your personal details and start your journey with us</p>
               <button className="ghost" id="signUp">
-                Sign Up
+                Register
               </button>
             </div>
           </div>

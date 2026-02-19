@@ -34,6 +34,9 @@ class Property extends Model
         'floor',
         'description',
         'features',
+        'photo1', // principal image
+        'photo2', // secondary image
+        'photo3', // secondary image
     ];
 
     /**

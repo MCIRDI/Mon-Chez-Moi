@@ -2,6 +2,8 @@ import { useState, useContext } from "react";
 import { AppContext } from "@/Context/AppContext";
 import { register, login } from "@/Services/AuthService";
 import { useNavigate } from "react-router-dom";
+import { XCircle } from "lucide-react";
+import LoadingSpinner from "@/ui/LoadingSpinner";
 
 interface RegisterData {
   name: string;
@@ -28,6 +30,8 @@ export default function AuthPageMobile() {
     password: "",
   });
   const [errorMessage, setErrorMessage] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const appContext = useContext(AppContext);
   const navigate = useNavigate();
@@ -36,6 +40,7 @@ export default function AuthPageMobile() {
 
   async function handleRegister(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setIsRegistering(true);
     try {
       const data = await register(registerData);
       setToken(data.token.plainTextToken);
@@ -47,11 +52,14 @@ export default function AuthPageMobile() {
       } else {
         setErrorMessage("An unexpected error occurred");
       }
+    } finally {
+      setIsRegistering(false);
     }
   }
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setIsLoggingIn(true);
     try {
       const data = await login(loginData);
       setToken(data.token.plainTextToken);
@@ -63,11 +71,21 @@ export default function AuthPageMobile() {
       } else {
         setErrorMessage("An unexpected error occurred");
       }
+    } finally {
+      setIsLoggingIn(false);
     }
   }
 
   return (
-    <div className="min-h-screen w-screen bg-white flex flex-col justify-center items-center p-6 font-[Montserrat]">
+    <div className="relative min-h-screen w-screen bg-white flex flex-col justify-center items-center p-6 font-[Montserrat]">
+      <XCircle
+        onClick={() => {
+          navigate(-1);
+        }}
+        className="absolute top-5 right-5 hover:cursor-pointer "
+        color="black"
+        size={40}
+      />
       <h1 className="text-2xl font-bold mb-6">
         {mode === "login" ? "Sign In" : "Create Account"}
       </h1>
@@ -122,9 +140,17 @@ export default function AuthPageMobile() {
           />
           <button
             type="submit"
-            className="bg-blue-500 text-white py-3 rounded-full font-bold"
+            disabled={isRegistering}
+            className="bg-blue-500 text-white py-3 rounded-full font-bold disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Sign Up
+            {isRegistering ? (
+              <>
+                <LoadingSpinner size="sm" />
+                Signing Up...
+              </>
+            ) : (
+              "Sign Up"
+            )}
           </button>
           <p className="text-sm text-gray-600 text-center mt-4">
             Already have an account?{" "}
@@ -162,10 +188,27 @@ export default function AuthPageMobile() {
           />
           <button
             type="submit"
-            className="bg-blue-500 text-white py-3 rounded-full font-bold"
+            disabled={isLoggingIn}
+            className="bg-blue-500 text-white py-3 rounded-full font-bold disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Sign In
+            {isLoggingIn ? (
+              <>
+                <LoadingSpinner size="sm" />
+                Signing In...
+              </>
+            ) : (
+              "Sign In"
+            )}
           </button>
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => navigate("/ForgotPassword")}
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            >
+              Forgot your password?
+            </button>
+          </div>
           <p className="text-sm text-gray-600 text-center mt-4">
             Don’t have an account?{" "}
             <button

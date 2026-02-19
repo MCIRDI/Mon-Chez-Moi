@@ -1,12 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./Pages/Layout";
 import Home from "./Pages/Home/Home";
-import Search from "./Pages/Search/Search";
-import Property from "./Pages/Search/Property";
-import PropertyForm from "./AddProperty/AddProperty";
-import MyProperties from "./AddProperty/MyProperies";
-import Favorites from "./Pages/Favorites/Favorites";
+import Search from "./Pages/Search";
+import Property from "./Pages/Property";
+import PropertyForm from "./Pages/AddProperty";
+import MyProperties from "./Pages/MyProperies";
+import Favorites from "./Pages/Favorites";
 import AuthPageMobile from "./Pages/Auth/AuthPageMobile";
+import ForgotPassword from "./Pages/Auth/ForgotPassword";
+import ResetPassword from "./Pages/Auth/ResetPassword";
 import ScrollToTop from "./ScrollToTop";
 
 function App() {
@@ -22,6 +24,8 @@ function App() {
           <Route path="AddProperty/:id?" element={<PropertyForm />} />
           <Route path="favorites" element={<Favorites />} />
           <Route path="AuthPageMobile" element={<AuthPageMobile />} />
+          <Route path="ForgotPassword" element={<ForgotPassword />} />
+          <Route path="reset-password" element={<ResetPassword />} />
         </Route>
       </Routes>
     </BrowserRouter>

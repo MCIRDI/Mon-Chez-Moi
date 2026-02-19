@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,800");
 
 .auth-container h1 {
-  @apply font-bold m-0 text-lg;
+  @apply font-bold m-0 text-lg pb-5;
 }
 
 .auth-container h2 {
@@ -186,7 +186,7 @@
   transform: translateX(20%);
 }
 
-.auth-container .social-container {
+/* .auth-container .social-container {
   margin: 20px 0;
 }
 
@@ -199,4 +199,4 @@
   margin: 0 5px;
   height: 40px;
   width: 40px;
-}
+} */

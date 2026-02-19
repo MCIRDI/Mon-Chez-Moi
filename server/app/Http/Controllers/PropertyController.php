@@ -5,10 +5,80 @@ namespace App\Http\Controllers;
 use App\Models\Favorite;
 use App\Models\Property;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rule;
 
 class PropertyController extends Controller
 {
+    /**
+     * Format validation errors into user-friendly messages
+     */
+    private function formatValidationErrors(array $errors): array
+    {
+        $formattedErrors = [];
+        
+        foreach ($errors as $field => $messages) {
+            $fieldName = $this->getFieldDisplayName($field);
+            foreach ($messages as $message) {
+                $formattedErrors[] = [
+                    'field' => $fieldName,
+                    'message' => $this->formatErrorMessage($message, $fieldName)
+                ];
+            }
+        }
+        
+        return $formattedErrors;
+    }
+    
+    /**
+     * Get display name for validation fields
+     */
+    private function getFieldDisplayName(string $field): string
+    {
+        $fieldNames = [
+            'photo1' => 'Main Photo',
+            'photo2' => 'Second Photo',
+            'photo3' => 'Third Photo',
+            'rent_or_sale' => 'Rent or Sale',
+            'price' => 'Price',
+            'state' => 'State',
+            'municipality' => 'Municipality',
+            'exact_address' => 'Address',
+            'number_rooms' => 'Number of Rooms',
+            'space' => 'Space (m²)',
+            'type' => 'Property Type',
+            'floor' => 'Floor',
+            'description' => 'Description',
+            'features' => 'Features'
+        ];
+        
+        return $fieldNames[$field] ?? ucfirst($field);
+    }
+    
+    /**
+     * Format error message to be more user-friendly
+     */
+    private function formatErrorMessage(string $message, string $fieldName): string
+    {
+        // Replace field names with display names
+        $message = str_replace([
+            'photo1', 'photo2', 'photo3',
+            'rent or sale', 'price', 'state', 'municipality',
+            'exact address', 'number rooms', 'space', 'type', 'floor', 'description'
+        ], [
+            'main photo', 'second photo', 'third photo',
+            'rent or sale option', 'price', 'state', 'municipality',
+            'address', 'number of rooms', 'space', 'property type', 'floor', 'description'
+        ], $message);
+        
+        // Add file size information for photo errors
+        if (strpos($message, 'photo') !== false && strpos($message, 'max') !== false) {
+            $message .= ' (Maximum file size is 10MB)';
+        }
+        
+        return ucfirst($message);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -41,12 +111,21 @@ return response()->json($properties);
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        try {
 
+public function store(Request $request)
+{
+    try {
+        if (!auth()->check()) {
+            return response()->json([
+                'message' => 'You must be logged in to create a property',
+            ], 401);
+        }
+
+        // Validate input including images
         $validatedData = $request->validate([
-          //  'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'photo1' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240', // principal (10MB)
+            'photo2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // secondary (10MB)
+            'photo3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // secondary (10MB)
             'rent_or_sale' => ['required', Rule::in(['rent', 'sale'])],
             'price' => 'required|numeric|min:0',
             'state' => 'required|string|max:255',
@@ -58,21 +137,40 @@ return response()->json($properties);
             'floor' => 'nullable|integer|min:0',
             'description' => 'nullable|string|max:1000',
             'features' => 'nullable|array',
-            'features.*' => 'string|max:30', // Each item in the array must be a string of max 255 characters
+            'features.*' => 'string|max:30',
         ]);
+
+        // Save uploaded images to storage and store paths
+        foreach (['photo1', 'photo2', 'photo3'] as $photoKey) {
+            if ($request->hasFile($photoKey)) {
+                $validatedData[$photoKey] = $request->file($photoKey)->store('properties', 'public');
+            }
+        }
+
+        // Attach authenticated user ID
         $validatedData['id_user'] = auth()->id();
-        Property::create($validatedData);
 
-        return response()->json(['message' => 'Property successfully registered', 'data' => $validatedData], 201);
+        // Create property record
+        $property = Property::create($validatedData);
 
+        return response()->json([
+            'message' => 'Property successfully registered',
+            'data' => $property,
+        ], 201);
+
+    } catch (ValidationException $e) {
+        return response()->json([
+            'message' => 'Validation failed',
+            'errors' => $e->errors(),
+            'error_details' => $this->formatValidationErrors($e->errors())
+        ], 422);
     } catch (\Exception $e) {
         return response()->json([
             'message' => 'An error occurred while creating the property',
             'error' => $e->getMessage(),
-        ], 500); // 500 Internal Server Error
+        ], 500);
     }
-    }
-
+}
     /**
      * Display the specified resource.
      */
@@ -99,9 +197,13 @@ return response()->json($properties);
     public function update(Request $request, string $id)
     {
         try {
+            \Log::info('Update request for property ID: ' . $id);
+            \Log::info('Request data: ', $request->all());
 
             $validatedData = $request->validate([
-                //  'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'photo1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+                'photo2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+                'photo3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
                   'rent_or_sale' => ['required', Rule::in(['rent', 'sale'])],
                   'price' => 'required|numeric|min:0',
                   'state' => 'required|string|max:255',
@@ -128,14 +230,32 @@ return response()->json($properties);
             ], 403); // 403 Forbidden
            }
 
+        // Save uploaded images to storage and store paths
+        foreach (['photo1', 'photo2', 'photo3'] as $photoKey) {
+            if ($request->hasFile($photoKey)) {
+                $validatedData[$photoKey] = $request->file($photoKey)->store('properties', 'public');
+            }
+        }
+
+        \Log::info('Validated data: ', $validatedData);
+        
         $property->update($validatedData);
+        \Log::info('Property updated successfully');
 
         return response()->json([
             'message' => 'Property successfully updated',
             'data' => $property,
         ], 200); // 200 OK
 
+    } catch (ValidationException $e) {
+        \Log::error('Validation error: ' . json_encode($e->errors()));
+        return response()->json([
+            'message' => 'Validation failed',
+            'errors' => $e->errors(),
+            'error_details' => $this->formatValidationErrors($e->errors())
+        ], 422);
     } catch (\Exception $e) {
+        \Log::error('Update error: ' . $e->getMessage());
         return response()->json([
             'message' => 'An error occurred while  updating the property',
             'error' => $e->getMessage(),

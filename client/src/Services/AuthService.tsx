@@ -1,5 +1,6 @@
 import api from "./api";
 import axios from "axios";
+
 export async function register(fields: {
   name: string;
   email: string;
@@ -7,38 +8,28 @@ export async function register(fields: {
 }) {
   const response = await api.post("/register", fields);
   console.log(response.data);
-  localStorage.setItem("token", response.data.token.plainTextToken); // Store the token in local storage
+  localStorage.setItem("token", response.data.token.plainTextToken);
   return response.data;
 }
-// export async function login(fields: { email: string; password: string }) {
-//   const response = await api.post("/login", fields);
-//   console.log(response.data);
-// }
+
 export async function login(fields: { email: string; password: string }) {
   try {
     const response = await api.post("/login", fields);
-    console.log("the user infos :" + response.data.user); // Successful login response
-    localStorage.setItem("token", response.data.token.plainTextToken); // Store the token in local storage
+    console.log("the user infos :" + response.data.user);
+    localStorage.setItem("token", response.data.token.plainTextToken);
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      // If the error is an Axios error
       if (error.response) {
-        // If the error is related to the response (e.g., 401, 400)
         const errorMessage =
           error.response.data.message || "An error occurred during login.";
-        // console.log("Error:", errorMessage);
-        throw new Error(errorMessage); // Throw a user-friendly error message
+        throw new Error(errorMessage);
       } else if (error.request) {
-        // If the error is related to the request itself (no response received)
-        // console.log("No response received:", error.request);
         throw new Error(
-          "Network error: Unable to connect to the server. Please try again later."
+          "Network error: Unable to connect to the server. Please try again later.",
         );
       }
     } else {
-      // If the error is not an Axios error, it might be some other error (e.g., a coding error)
-      // console.log("Error occurred:", (error as Error).message);
       throw new Error("An unexpected error occurred. Please try again later.");
     }
   }
@@ -50,4 +41,51 @@ export async function getUser() {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
+}
+
+export async function forgotPassword(email: string) {
+  try {
+    const response = await api.post("/forgot-password", { email });
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        const errorMessage =
+          error.response.data.message || "An error occurred while sending reset instructions.";
+        throw new Error(errorMessage);
+      } else if (error.request) {
+        throw new Error(
+          "Network error: Unable to connect to the server. Please try again later.",
+        );
+      }
+    } else {
+      throw new Error("An unexpected error occurred. Please try again later.");
+    }
+  }
+}
+
+export async function resetPassword(fields: {
+  token: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}) {
+  try {
+    const response = await api.post("/reset-password", fields);
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        const errorMessage =
+          error.response.data.message || "An error occurred while resetting password.";
+        throw new Error(errorMessage);
+      } else if (error.request) {
+        throw new Error(
+          "Network error: Unable to connect to the server. Please try again later.",
+        );
+      }
+    } else {
+      throw new Error("An unexpected error occurred. Please try again later.");
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import React, { FC, useState, useRef, useEffect, useContext } from "react";
+import { FC, useState, useRef, useEffect, useContext } from "react";
 import { Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "@/Context/AppContext";
@@ -43,7 +43,7 @@ const Sidebar: FC = () => {
     { name: "Search", link: "/Search" },
     { name: "My properties", link: user ? "Myproperties" : "/AuthPageMobile" },
     { name: "Favorites", link: user ? "favorites" : "/AuthPageMobile" },
-    ...(!user ? [{ name: "Login", link: "/AuthPageMobile" }] : []),
+    ...(!user ? [{ name: "Sign In", link: "/AuthPageMobile" }] : []),
   ];
 
   return (
