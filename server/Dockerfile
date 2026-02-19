@@ -41,7 +41,6 @@ RUN docker-php-ext-install -j$(nproc) bcmath
 RUN docker-php-ext-install -j$(nproc) ctype
 RUN docker-php-ext-install -j$(nproc) opcache
 RUN docker-php-ext-install -j$(nproc) filter
-RUN docker-php-ext-install -j$(nproc) hash
 RUN docker-php-ext-install -j$(nproc) mbstring
 RUN docker-php-ext-install -j$(nproc) session
 RUN docker-php-ext-install -j$(nproc) simplexml
