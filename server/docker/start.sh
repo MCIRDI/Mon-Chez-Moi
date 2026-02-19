@@ -45,6 +45,15 @@ echo "=== DEBUG: Generated .env file ==="
 cat /var/www/html/.env
 echo "================================="
 
+# Clear all Laravel caches to ensure fresh environment loading
+echo "=== Clearing Laravel caches ==="
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
+php artisan config:cache
+echo "=== Laravel caches cleared ==="
+
 # Replace port in nginx config with Render's PORT
 sed -i "s/listen 8080;/listen ${PORT:-8080};/g" /etc/nginx/nginx.conf
 
