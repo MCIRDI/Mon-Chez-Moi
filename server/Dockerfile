@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Force cache invalidation - worker removed - 2025-02-19-21:50
+# Build: Force cache invalidation - port binding fix - 2025-02-19-23:23
 FROM php:8.2-fpm-alpine
 
 # Set working directory
@@ -106,6 +106,10 @@ RUN php artisan config:cache \
 # Optimize application
 RUN php artisan optimize
 
+# Copy startup script
+COPY docker/start.sh /start.sh
+RUN chmod +x /start.sh
+
 # Copy nginx configuration for Render
 COPY docker/render-nginx.conf /etc/nginx/nginx.conf
 
@@ -115,8 +119,8 @@ COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 # Copy supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Expose ports (Render uses port 10000 internally, we listen on 8080)
-EXPOSE 8080
+# Expose ports (Render will set PORT env var)
+EXPOSE 10000
 
-# Start supervisor to run both nginx and php-fpm
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Use startup script to handle port binding
+CMD ["/start.sh"]
