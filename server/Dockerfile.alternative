@@ -1,11 +1,11 @@
-# Use the official PHP 8.2 FPM image as base
-FROM php:8.2-fpm-alpine
+# Use Ubuntu-based PHP image for better compatibility
+FROM php:8.2-fpm
 
 # Set working directory
 WORKDIR /var/www/html
 
 # Install system dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     nginx \
     supervisor \
     curl \
@@ -15,32 +15,31 @@ RUN apk add --no-cache \
     unzip \
     libzip-dev \
     libpng-dev \
-    libjpeg-turbo-dev \
+    libjpeg-dev \
     libwebp-dev \
-    freetype-dev \
+    libfreetype6-dev \
     libxml2-dev \
-    oniguruma-dev \
-    icu-dev \
-    icu-data-full \
-    postgresql-dev \
-    mysql-client \
-    g++ \
-    make \
-    autoconf \
-    linux-headers
+    libonig-dev \
+    libicu-dev \
+    postgresql-client \
+    build-essential \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions in separate steps for better error handling
+# Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install -j$(nproc) gd
-
-# Install core extensions (excluding problematic ones)
-RUN docker-php-ext-install -j$(nproc) \
+    && docker-php-ext-install -j$(nproc) \
+        gd \
         zip \
         pdo_mysql \
         pdo_pgsql \
         bcmath \
+        xml \
         ctype \
+        iconv \
+        intl \
         opcache \
+        dom \
         filter \
         hash \
         mbstring \
@@ -48,16 +47,6 @@ RUN docker-php-ext-install -j$(nproc) \
         simplexml \
         tokenizer \
         xmlwriter
-
-# Install XML and DOM extensions separately
-RUN docker-php-ext-install -j$(nproc) xml
-
-# Install intl extension separately (requires ICU)
-RUN docker-php-ext-configure intl \
-    && docker-php-ext-install -j$(nproc) intl
-
-# Enable iconv (built-in on Alpine)
-RUN docker-php-ext-enable iconv
 
 # Install and configure Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
