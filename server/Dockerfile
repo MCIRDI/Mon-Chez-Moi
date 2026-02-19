@@ -45,7 +45,6 @@ RUN docker-php-ext-install -j$(nproc) filter
 RUN docker-php-ext-install -j$(nproc) mbstring
 RUN docker-php-ext-install -j$(nproc) session
 RUN docker-php-ext-install -j$(nproc) simplexml
-RUN docker-php-ext-install -j$(nproc) tokenizer
 RUN docker-php-ext-install -j$(nproc) xmlwriter
 RUN docker-php-ext-install -j$(nproc) xml
 
