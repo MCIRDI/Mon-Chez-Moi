@@ -15,6 +15,45 @@ Route::get('/health', function () {
     ]);
 });
 
+// Database connection test endpoint
+Route::get('/db-test', function () {
+    try {
+        // Test database connection
+        \DB::connection()->getPdo();
+        $databaseName = \DB::connection()->getDatabaseName();
+        
+        // Test if users table exists
+        $usersTableExists = \Schema::hasTable('users');
+        
+        // Test if migrations table exists
+        $migrationsTableExists = \Schema::hasTable('migrations');
+        
+        return response()->json([
+            'database_connection' => 'success',
+            'database_name' => $databaseName,
+            'users_table_exists' => $usersTableExists,
+            'migrations_table_exists' => $migrationsTableExists,
+            'db_config' => [
+                'driver' => config('database.default'),
+                'connection' => config('database.connections.pgsql.host'),
+                'port' => config('database.connections.pgsql.port'),
+                'database' => config('database.connections.pgsql.database'),
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'database_connection' => 'failed',
+            'error' => $e->getMessage(),
+            'db_config' => [
+                'driver' => config('database.default'),
+                'connection' => config('database.connections.pgsql.host'),
+                'port' => config('database.connections.pgsql.port'),
+                'database' => config('database.connections.pgsql.database'),
+            ]
+        ], 500);
+    }
+});
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
