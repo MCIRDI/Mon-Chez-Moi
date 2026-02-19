@@ -6,6 +6,28 @@ mkdir -p /var/lib/php/sessions
 mkdir -p /var/log/supervisor
 mkdir -p /var/run/php-fpm
 
+# Set up environment variables for Laravel
+cat > /var/www/html/.env << EOF
+APP_NAME=${APP_NAME:-Laravel}
+APP_ENV=${APP_ENV:-production}
+APP_KEY=${APP_KEY}
+APP_DEBUG=${APP_DEBUG:-false}
+APP_URL=${APP_URL}
+FRONTEND_URL=${FRONTEND_URL}
+DB_CONNECTION=${DB_CONNECTION:-pgsql}
+DB_HOST=${DB_HOST}
+DB_PORT=${DB_PORT:-5432}
+DB_DATABASE=${DB_DATABASE}
+DB_USERNAME=${DB_USERNAME}
+DB_PASSWORD=${DB_PASSWORD}
+CACHE_DRIVER=${CACHE_DRIVER:-redis}
+SESSION_DRIVER=${SESSION_DRIVER:-redis}
+REDIS_HOST=${REDIS_HOST}
+REDIS_PORT=${REDIS_PORT}
+REDIS_PASSWORD=${REDIS_PASSWORD}
+QUEUE_CONNECTION=${QUEUE_CONNECTION:-database}
+EOF
+
 # Replace port in nginx config with Render's PORT
 sed -i "s/listen 8080;/listen ${PORT:-8080};/g" /etc/nginx/nginx.conf
 

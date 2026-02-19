@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Force cache invalidation - env variables fix - 2025-02-20-00:30
+# Build: Force cache invalidation - runtime env setup - 2025-02-20-00:34
 FROM php:8.2-fpm-alpine
 
 # Set working directory
@@ -91,26 +91,6 @@ RUN composer dump-autoload --optimize
 
 # Copy environment file
 RUN cp .env.example .env
-
-# Create proper .env file that uses environment variables
-RUN echo "APP_NAME=\${APP_NAME:-Laravel}" >> .env && \
-    echo "APP_ENV=\${APP_ENV:-production}" >> .env && \
-    echo "APP_KEY=\${APP_KEY}" >> .env && \
-    echo "APP_DEBUG=\${APP_DEBUG:-false}" >> .env && \
-    echo "APP_URL=\${APP_URL}" >> .env && \
-    echo "FRONTEND_URL=\${FRONTEND_URL}" >> .env && \
-    echo "DB_CONNECTION=\${DB_CONNECTION:-pgsql}" >> .env && \
-    echo "DB_HOST=\${DB_HOST}" >> .env && \
-    echo "DB_PORT=\${DB_PORT:-5432}" >> .env && \
-    echo "DB_DATABASE=\${DB_DATABASE}" >> .env && \
-    echo "DB_USERNAME=\${DB_USERNAME}" >> .env && \
-    echo "DB_PASSWORD=\${DB_PASSWORD}" >> .env && \
-    echo "CACHE_DRIVER=\${CACHE_DRIVER:-redis}" >> .env && \
-    echo "SESSION_DRIVER=\${SESSION_DRIVER:-redis}" >> .env && \
-    echo "REDIS_HOST=\${REDIS_HOST}" >> .env && \
-    echo "REDIS_PORT=\${REDIS_PORT}" >> .env && \
-    echo "REDIS_PASSWORD=\${REDIS_PASSWORD}" >> .env && \
-    echo "QUEUE_CONNECTION=\${QUEUE_CONNECTION:-database}" >> .env
 
 # Generate application key
 RUN php artisan key:generate --force
