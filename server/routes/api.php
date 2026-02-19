@@ -5,6 +5,15 @@ use App\Http\Controllers\PropertyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// Health check endpoint
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'message' => 'API is running',
+        'timestamp' => now()->toISOString(),
+        'version' => '1.0.0'
+    ]);
+});
 
 Route::get('/user', function (Request $request) {
     return $request->user();
