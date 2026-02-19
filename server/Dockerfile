@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Force cache invalidation - nginx port fix - 2025-02-19-21:25
+# Build: Force cache invalidation - worker removed - 2025-02-19-21:50
 FROM php:8.2-fpm-alpine
 
 # Set working directory
