@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Force cache invalidation - CORS package added - 2025-02-19-21:15
+# Build: Force cache invalidation - nginx port fix - 2025-02-19-21:25
 FROM php:8.2-fpm-alpine
 
 # Set working directory
@@ -106,8 +106,8 @@ RUN php artisan config:cache \
 # Optimize application
 RUN php artisan optimize
 
-# Copy nginx configuration
-COPY docker/nginx.conf /etc/nginx/nginx.conf
+# Copy nginx configuration for Render
+COPY docker/render-nginx.conf /etc/nginx/nginx.conf
 
 # Copy PHP-FPM configuration
 COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
@@ -115,8 +115,8 @@ COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 # Copy supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Expose ports
-EXPOSE 80
+# Expose ports (Render uses port 10000 internally, we listen on 8080)
+EXPOSE 8080
 
 # Start supervisor to run both nginx and php-fpm
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
