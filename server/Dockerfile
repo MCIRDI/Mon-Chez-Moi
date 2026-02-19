@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Force cache invalidation - iconv removed - 2025-02-19-20:40
+# Build: Force cache invalidation - CORS package added - 2025-02-19-21:15
 FROM php:8.2-fpm-alpine
 
 # Set working directory
@@ -72,6 +72,11 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.revalidate_freq=2" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.fast_shutdown=1" >> /usr/local/etc/php/conf.d/opcache.ini
 
+# Install Composer dependencies (production only)
+# Copy composer files first for better cache utilization
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts
+
 # Copy application files
 COPY . /var/www/html
 
@@ -81,8 +86,8 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/bootstrap/cache \
     && mkdir -p /var/log/supervisor
 
-# Install Composer dependencies (production only)
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Run composer scripts after copying all files
+RUN composer dump-autoload --optimize
 
 # Copy environment file
 RUN cp .env.example .env
