@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Force cache invalidation - database test - 2025-02-20-00:22
+# Build: Force cache invalidation - env debugging - 2025-02-20-00:26
 FROM php:8.2-fpm-alpine
 
 # Set working directory

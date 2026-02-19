@@ -18,6 +18,16 @@ Route::get('/health', function () {
 // Database connection test endpoint
 Route::get('/db-test', function () {
     try {
+        // Debug: Show all environment variables
+        $envVars = [
+            'DB_CONNECTION' => env('DB_CONNECTION'),
+            'DB_HOST' => env('DB_HOST'),
+            'DB_PORT' => env('DB_PORT'),
+            'DB_DATABASE' => env('DB_DATABASE'),
+            'DB_USERNAME' => env('DB_USERNAME'),
+            'DB_PASSWORD' => env('DB_PASSWORD') ? '***SET***' : 'NOT_SET',
+        ];
+        
         // Test database connection
         \DB::connection()->getPdo();
         $databaseName = \DB::connection()->getDatabaseName();
@@ -33,6 +43,7 @@ Route::get('/db-test', function () {
             'database_name' => $databaseName,
             'users_table_exists' => $usersTableExists,
             'migrations_table_exists' => $migrationsTableExists,
+            'environment_variables' => $envVars,
             'db_config' => [
                 'driver' => config('database.default'),
                 'connection' => config('database.connections.pgsql.host'),
@@ -44,6 +55,14 @@ Route::get('/db-test', function () {
         return response()->json([
             'database_connection' => 'failed',
             'error' => $e->getMessage(),
+            'environment_variables' => [
+                'DB_CONNECTION' => env('DB_CONNECTION'),
+                'DB_HOST' => env('DB_HOST'),
+                'DB_PORT' => env('DB_PORT'),
+                'DB_DATABASE' => env('DB_DATABASE'),
+                'DB_USERNAME' => env('DB_USERNAME'),
+                'DB_PASSWORD' => env('DB_PASSWORD') ? '***SET***' : 'NOT_SET',
+            ],
             'db_config' => [
                 'driver' => config('database.default'),
                 'connection' => config('database.connections.pgsql.host'),
