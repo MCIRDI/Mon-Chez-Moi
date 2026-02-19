@@ -75,10 +75,11 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
 # Copy application files
 COPY . /var/www/html
 
-# Set proper permissions
+# Set proper permissions and create required directories
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 755 /var/www/html/bootstrap/cache \
+    && mkdir -p /var/log/supervisor
 
 # Install Composer dependencies (production only)
 RUN composer install --no-dev --optimize-autoloader --no-interaction
