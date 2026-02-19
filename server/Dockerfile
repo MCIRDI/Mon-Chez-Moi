@@ -21,6 +21,7 @@ RUN apk add --no-cache \
     libxml2-dev \
     oniguruma-dev \
     icu-dev \
+    icu-data-full \
     postgresql-dev \
     mysql-client \
     g++ \
@@ -28,17 +29,17 @@ RUN apk add --no-cache \
     autoconf \
     linux-headers
 
-# Install PHP extensions
+# Install PHP extensions in separate steps for better error handling
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install -j$(nproc) \
-        gd \
+    && docker-php-ext-install -j$(nproc) gd
+
+RUN docker-php-ext-install -j$(nproc) \
         zip \
         pdo_mysql \
         pdo_pgsql \
         bcmath \
         xml \
         ctype \
-        intl \
         opcache \
         dom \
         filter \
@@ -49,7 +50,11 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
         tokenizer \
         xmlwriter
 
-# Install iconv separately (it's built-in in Alpine PHP)
+# Install intl extension separately (requires ICU)
+RUN docker-php-ext-configure intl \
+    && docker-php-ext-install -j$(nproc) intl
+
+# Enable iconv (built-in on Alpine)
 RUN docker-php-ext-enable iconv
 
 # Install and configure Composer
