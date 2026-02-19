@@ -49,8 +49,9 @@ RUN docker-php-ext-install -j$(nproc) xmlwriter
 RUN docker-php-ext-install -j$(nproc) xml
 
 # Install intl extension separately (requires ICU)
-RUN docker-php-ext-configure intl \
-    && docker-php-ext-install -j$(nproc) intl
+# REMOVED: intl extension to reduce build time and avoid timeout
+# RUN docker-php-ext-configure intl \
+#     && docker-php-ext-install -j$(nproc) intl
 
 # Enable iconv (built-in on Alpine)
 RUN docker-php-ext-enable iconv
