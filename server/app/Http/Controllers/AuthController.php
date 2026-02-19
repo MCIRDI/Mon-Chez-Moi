@@ -13,17 +13,29 @@ class AuthController extends Controller
   public function register(Request $request){
 
         try {
+            \Log::info('Registration attempt', ['request_data' => $request->all()]);
+            
             $fields=$request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|min:8|confirmed',
                    ]);
             
+            \Log::info('Validation passed', ['fields' => $fields]);
+            
             // Hash the password
             $fields['password'] = bcrypt($fields['password']);
             
+            \Log::info('Password hashed, creating user');
+            
             $user=User::create($fields);
+            
+            \Log::info('User created successfully', ['user_id' => $user->id]);
+            
             $token=$user->createToken($request->name);
+            
+            \Log::info('Token created successfully');
+            
             return response()->json([
              'user' => [
                 'id' => $user->id,
@@ -31,8 +43,11 @@ class AuthController extends Controller
 
              ],                'token' => $token,
             ], 201);
-            } catch (\Exception $e) {
-                //if i do not add the try catch laravel dont return the errors when validating $filds
+            } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed', ['errors' => $e->errors()]);
+            return response()->json(['error' => 'Validation failed', 'details' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            \Log::error('Registration error', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
 
