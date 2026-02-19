@@ -15,7 +15,7 @@ services:
       - key: APP_URL
         value: https://mon-chez-moi-api.onrender.com
       - key: FRONTEND_URL
-        value: https://mon-chez-moi.onrender.com
+        value: https://mon-chez-moi-six.vercel.app
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST
