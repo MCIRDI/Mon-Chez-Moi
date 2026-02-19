@@ -33,23 +33,20 @@ RUN apk add --no-cache \
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) gd
 
-# Install core extensions (excluding problematic ones)
-RUN docker-php-ext-install -j$(nproc) \
-        zip \
-        pdo_mysql \
-        pdo_pgsql \
-        bcmath \
-        ctype \
-        opcache \
-        filter \
-        hash \
-        mbstring \
-        session \
-        simplexml \
-        tokenizer \
-        xmlwriter
-
-# Install XML and DOM extensions separately
+# Install extensions one by one to isolate issues
+RUN docker-php-ext-install -j$(nproc) zip
+RUN docker-php-ext-install -j$(nproc) pdo_mysql
+RUN docker-php-ext-install -j$(nproc) pdo_pgsql
+RUN docker-php-ext-install -j$(nproc) bcmath
+RUN docker-php-ext-install -j$(nproc) ctype
+RUN docker-php-ext-install -j$(nproc) opcache
+RUN docker-php-ext-install -j$(nproc) filter
+RUN docker-php-ext-install -j$(nproc) hash
+RUN docker-php-ext-install -j$(nproc) mbstring
+RUN docker-php-ext-install -j$(nproc) session
+RUN docker-php-ext-install -j$(nproc) simplexml
+RUN docker-php-ext-install -j$(nproc) tokenizer
+RUN docker-php-ext-install -j$(nproc) xmlwriter
 RUN docker-php-ext-install -j$(nproc) xml
 
 # Install intl extension separately (requires ICU)
