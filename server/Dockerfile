@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Fixed hash extension issue - 2025-02-19
+# Build: Force cache invalidation - intl removed - 2025-02-19-20:35
 FROM php:8.2-fpm-alpine
 
 # Set working directory
