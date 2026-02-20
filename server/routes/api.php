@@ -15,6 +15,40 @@ Route::get('/health', function () {
     ]);
 });
 
+// Database write test endpoint
+Route::get('/db-write-test', function () {
+    try {
+        // Test database write by creating a simple test user
+        $testEmail = 'test_' . time() . '@example.com';
+        
+        \Log::info('Database write test, creating test user', ['email' => $testEmail]);
+        
+        $user = \App\Models\User::create([
+            'name' => 'Test User',
+            'email' => $testEmail,
+            'password' => bcrypt('password123'),
+        ]);
+        
+        \Log::info('Test user created successfully', ['user_id' => $user->id]);
+        
+        // Clean up - delete the test user
+        $user->delete();
+        \Log::info('Test user deleted successfully');
+        
+        return response()->json([
+            'database_write' => 'success',
+            'test_email' => $testEmail,
+            'message' => 'Database write test passed'
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Database write test failed', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+        return response()->json([
+            'database_write' => 'failed',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
 // Database connection test endpoint
 Route::get('/db-test', function () {
     try {
