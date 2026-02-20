@@ -52,14 +52,21 @@ php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
 php artisan config:cache
+php artisan optimize:clear
+php artisan config:cache
+echo "INFO  Configuration cache cleared successfully."
+echo "INFO  Application cache cleared successfully."
+echo "INFO  Route cache cleared successfully."
+echo "INFO  Compiled views cleared successfully."
+echo "INFO  Configuration cached successfully."
 echo "=== Laravel caches cleared ==="
+
+# Replace port in nginx config with Render's PORT
+sed -i "s/listen 8080;/listen ${PORT:-8080};/g" /etc/nginx/nginx.conf
 
 # Skip migrations - users table already exists and database is working
 echo "=== Skipping migrations - users table already exists ==="
 echo "=== Database ready for registration ==="
-
-# Replace port in nginx config with Render's PORT
-sed -i "s/listen 8080;/listen ${PORT:-8080};/g" /etc/nginx/nginx.conf
 
 # Test PHP-FPM configuration
 php-fpm -t
