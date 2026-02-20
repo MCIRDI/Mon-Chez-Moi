@@ -44,8 +44,12 @@ class AuthController extends Controller
              ],                'token' => $token,
             ], 201);
             } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Validation failed', ['errors' => $e->errors()]);
-            return response()->json(['error' => 'Validation failed', 'details' => $e->errors()], 422);
+            \Log::error('Validation failed', ['errors' => $e->errors(), 'request_data' => $request->all()]);
+            return response()->json([
+                'error' => 'Validation failed', 
+                'details' => $e->errors(),
+                'request_data' => $request->all()
+            ], 422);
         } catch (\Exception $e) {
             \Log::error('Registration error', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['error' => $e->getMessage()], 500);
