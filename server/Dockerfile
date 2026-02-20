@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Force cache invalidation - complete nginx fix - 2025-02-20-02:23
+# Build: Force cache invalidation - remove Laravel CORS - 2025-02-20-02:35
 FROM php:8.2-fpm-alpine
 
 # Set working directory
