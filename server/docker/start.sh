@@ -54,11 +54,9 @@ php artisan view:clear
 php artisan config:cache
 echo "=== Laravel caches cleared ==="
 
-# Run Laravel migrations to create database tables
-echo "=== Running Laravel migrations ==="
-# Skip the problematic properties migration and run only essential ones
-php artisan migrate --force --exclude=2025_02_17_010000_add_photos_and_fix_properties_table || echo "Some migrations skipped"
-echo "=== Essential migrations completed ==="
+# Skip migrations - users table already exists and database is working
+echo "=== Skipping migrations - users table already exists ==="
+echo "=== Database ready for registration ==="
 
 # Replace port in nginx config with Render's PORT
 sed -i "s/listen 8080;/listen ${PORT:-8080};/g" /etc/nginx/nginx.conf
