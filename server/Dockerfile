@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Force cache invalidation - add OPTIONS route - 2025-02-20-04:51
+# Build: Force cache invalidation - simplified fix - 2025-02-20-05:02
 FROM php:8.2-fpm-alpine
 
 # Set working directory
