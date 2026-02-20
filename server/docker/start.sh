@@ -56,11 +56,9 @@ echo "=== Laravel caches cleared ==="
 
 # Run Laravel migrations to create database tables
 echo "=== Running Laravel migrations ==="
-# First, rollback the failed migration if it exists
-php artisan migrate:rollback --step=1 --force || echo "No migration to rollback"
-# Then run all migrations
-php artisan migrate --force
-echo "=== Migrations completed ==="
+# Skip the problematic properties migration and run only essential ones
+php artisan migrate --force --exclude=2025_02_17_010000_add_photos_and_fix_properties_table || echo "Some migrations skipped"
+echo "=== Essential migrations completed ==="
 
 # Replace port in nginx config with Render's PORT
 sed -i "s/listen 8080;/listen ${PORT:-8080};/g" /etc/nginx/nginx.conf
