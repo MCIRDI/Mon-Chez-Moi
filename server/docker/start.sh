@@ -56,6 +56,9 @@ echo "=== Laravel caches cleared ==="
 
 # Run Laravel migrations to create database tables
 echo "=== Running Laravel migrations ==="
+# First, rollback the failed migration if it exists
+php artisan migrate:rollback --step=1 --force || echo "No migration to rollback"
+# Then run all migrations
 php artisan migrate --force
 echo "=== Migrations completed ==="
 

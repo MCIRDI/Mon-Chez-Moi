@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Force cache invalidation - write test - 2025-02-20-01:16
+# Build: Force cache invalidation - migration rollback - 2025-02-20-01:21
 FROM php:8.2-fpm-alpine
 
 # Set working directory
