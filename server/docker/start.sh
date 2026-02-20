@@ -54,6 +54,11 @@ php artisan view:clear
 php artisan config:cache
 echo "=== Laravel caches cleared ==="
 
+# Run Laravel migrations to create database tables
+echo "=== Running Laravel migrations ==="
+php artisan migrate --force
+echo "=== Migrations completed ==="
+
 # Replace port in nginx config with Render's PORT
 sed -i "s/listen 8080;/listen ${PORT:-8080};/g" /etc/nginx/nginx.conf
 
