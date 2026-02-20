@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Force cache invalidation - validation debug - 2025-02-20-01:44
+# Build: Force cache invalidation - CORS fix - 2025-02-20-02:05
 FROM php:8.2-fpm-alpine
 
 # Set working directory
