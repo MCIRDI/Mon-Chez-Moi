@@ -47,13 +47,20 @@ echo "================================="
 
 # Clear all Laravel caches to ensure fresh environment loading
 echo "=== Clearing Laravel caches ==="
+echo "Before cache clear:"
+ls -la bootstrap/cache/ 2>/dev/null || echo "Cache directory does not exist"
 rm -rf bootstrap/cache/*
+rm -rf storage/framework/cache/*
+rm -rf storage/framework/views/*
+rm -rf storage/framework/sessions/
 php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
 php artisan optimize:clear
 php artisan config:cache
+echo "After cache clear:"
+ls -la bootstrap/cache/ 2>/dev/null || echo "Cache directory does not exist"
 echo "INFO  Configuration cache cleared successfully."
 echo "INFO  Application cache cleared successfully."
 echo "INFO  Route cache cleared successfully."

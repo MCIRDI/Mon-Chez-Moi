@@ -1,5 +1,3 @@
-<?php
-
 return [
 
     /*
@@ -15,9 +13,9 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*'],
 
-    'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    'allowed_methods' => ['*'],
 
     'allowed_origins' => ['https://mon-chez-moi-six.vercel.app'],
 
