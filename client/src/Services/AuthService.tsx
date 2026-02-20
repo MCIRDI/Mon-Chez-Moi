@@ -7,6 +7,7 @@ export async function register(fields: {
   password: string;
   password_confirmation: string;
 }) {
+  console.log("Register data being sent:", fields);
   const response = await api.post("/register", fields);
   console.log(response.data);
   localStorage.setItem("token", response.data.token.plainTextToken);
