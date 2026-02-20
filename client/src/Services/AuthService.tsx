@@ -5,6 +5,7 @@ export async function register(fields: {
   name: string;
   email: string;
   password: string;
+  password_confirmation: string;
 }) {
   const response = await api.post("/register", fields);
   console.log(response.data);
