@@ -68,9 +68,10 @@ echo "=== Laravel caches cleared ==="
 # Replace port in nginx config with Render's PORT
 sed -i "s/listen 8080;/listen ${PORT:-8080};/g" /etc/nginx/nginx.conf
 
-# Skip migrations - users table already exists and database is working
-echo "=== Skipping migrations - users table already exists ==="
-echo "=== Database ready for registration ==="
+# Run migrations to add photo columns to properties table
+echo "=== Running migrations to add photo columns ==="
+php artisan migrate --force
+echo "=== Migrations completed ==="
 
 # Test PHP-FPM configuration
 php-fpm -t
