@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('photo3')->nullable()->after('photo2');
         });
 
-        // Fix the enum values to match controller validation
-        DB::statement("ALTER TABLE properties MODIFY COLUMN type ENUM('House', 'Villa', 'Apartment', 'Shop', 'Appartement', 'Boutique')");
+        // Fix the enum values for PostgreSQL - convert to VARCHAR with CHECK constraint
+        DB::statement("ALTER TABLE properties ALTER COLUMN type TYPE VARCHAR(20)");
+        DB::statement("ALTER TABLE properties ADD CONSTRAINT check_properties_type CHECK (type IN ('House', 'Villa', 'Apartment', 'Shop', 'Appartement', 'Boutique'))");
         
         // Make floor nullable
         Schema::table('properties', function (Blueprint $table) {
@@ -36,7 +37,8 @@ return new class extends Migration
             $table->dropColumn(['photo1', 'photo2', 'photo3']);
         });
 
-        DB::statement("ALTER TABLE properties MODIFY COLUMN type ENUM('House', 'Villa', 'Appartement', 'Boutique')");
+        // Remove check constraint for PostgreSQL
+        DB::statement("ALTER TABLE properties DROP CONSTRAINT IF EXISTS check_properties_type");
         
         Schema::table('properties', function (Blueprint $table) {
             $table->integer('floor')->nullable(false)->change();
