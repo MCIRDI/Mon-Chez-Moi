@@ -4,7 +4,7 @@ const baseURL = import.meta.env.VITE_API_BASE_URL || "https://mon-chez-moi.onren
 
 const api = axios.create({
   baseURL,
-  timeout: 50000,
+  timeout: 120000, // 2 minutes for large file uploads
   headers: {
     "Content-Type": "application/json",
     "Accept": "application/json",
