@@ -75,6 +75,11 @@ echo "=== Database ready for registration ==="
 # Test PHP-FPM configuration
 php-fpm -t
 
+# Set PHP upload limits
+echo "upload_max_filesize = 50M" >> /usr/local/etc/php/conf.d/uploads.ini
+echo "post_max_size = 50M" >> /usr/local/etc/php/conf.d/uploads.ini
+echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/uploads.ini
+
 # Start php-fpm in background with explicit config
 php-fpm -y /usr/local/etc/php-fpm.d/www.conf &
 

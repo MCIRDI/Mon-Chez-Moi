@@ -56,6 +56,10 @@ services:
         value: users
       - key: AUTH_PASSWORDS_USERS_EXPIRE
         value: 60
+      - key: PHP_UPLOAD_MAX_FILESIZE
+        value: 50M
+      - key: PHP_POST_MAX_SIZE
+        value: 50M
 
   # PostgreSQL Database
   - type: pserv
