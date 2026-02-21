@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // CORS handled completely by nginx
         // Remove ALL CORS middleware to prevent duplicate headers
+        $middleware->remove(\Illuminate\Http\Middleware\HandleCors::class);
         
         $middleware->alias([
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
