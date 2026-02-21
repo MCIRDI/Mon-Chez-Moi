@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Force cache invalidation - PostgreSQL migration fixes - 2025-02-21-03:28
+# Build: Force cache invalidation - fix enum constraint - 2025-02-21-03:37
 FROM php:8.2-fpm-alpine
 
 # Set working directory
