@@ -48,6 +48,10 @@ echo "================================="
 # Clear all Laravel caches to ensure fresh environment loading
 echo "=== Clearing Laravel caches ==="
 rm -rf bootstrap/cache/*
+rm -rf storage/framework/cache/*
+rm -rf storage/framework/views/*
+rm -rf storage/framework/sessions/
+rm -rf storage/framework/config/
 php artisan config:clear
 php artisan cache:clear
 php artisan route:clear

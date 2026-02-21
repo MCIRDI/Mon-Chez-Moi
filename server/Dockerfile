@@ -1,5 +1,5 @@
 # Use the official PHP 8.2 FPM image as base
-# Build: Force cache invalidation - nginx syntax fix - 2025-02-21-00:55
+# Build: Force cache invalidation - aggressive cache clear - 2025-02-21-01:06
 FROM php:8.2-fpm-alpine
 
 # Set working directory
