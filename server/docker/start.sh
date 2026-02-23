@@ -20,27 +20,27 @@ echo "=================================="
 
 # Set up environment variables for Laravel
 cat > /var/www/html/.env << EOF
-APP_NAME=${APP_NAME:-Laravel}
-APP_ENV=${APP_ENV:-production}
-APP_KEY=${APP_KEY}
-APP_DEBUG=${APP_DEBUG:-false}
-APP_URL=${APP_URL}
-FRONTEND_URL=${FRONTEND_URL}
-DB_CONNECTION=${DB_CONNECTION:-pgsql}
-DB_HOST=${DB_HOST}
-DB_PORT=${DB_PORT:-5432}
-DB_DATABASE=${DB_DATABASE}
-DB_USERNAME=${DB_USERNAME}
-DB_PASSWORD=${DB_PASSWORD}
+APP_NAME="${APP_NAME:-Laravel}"
+APP_ENV="${APP_ENV:-production}"
+APP_KEY="${APP_KEY}"
+APP_DEBUG="${APP_DEBUG:-false}"
+APP_URL="${APP_URL}"
+FRONTEND_URL="${FRONTEND_URL}"
+DB_CONNECTION="${DB_CONNECTION:-pgsql}"
+DB_HOST="${DB_HOST}"
+DB_PORT="${DB_PORT:-5432}"
+DB_DATABASE="${DB_DATABASE}"
+DB_USERNAME="${DB_USERNAME}"
+DB_PASSWORD="${DB_PASSWORD}"
 # Use file-based cache/session by default to avoid hard dependency on Redis.
 # Render Redis can still be enabled by setting CACHE_STORE/SESSION_DRIVER/REDIS_* env vars.
-CACHE_STORE=${CACHE_STORE:-file}
-CACHE_DRIVER=${CACHE_DRIVER:-file}
-SESSION_DRIVER=${SESSION_DRIVER:-file}
-REDIS_HOST=${REDIS_HOST}
-REDIS_PORT=${REDIS_PORT}
-REDIS_PASSWORD=${REDIS_PASSWORD}
-QUEUE_CONNECTION=${QUEUE_CONNECTION:-database}
+CACHE_STORE="${CACHE_STORE:-file}"
+CACHE_DRIVER="${CACHE_DRIVER:-file}"
+SESSION_DRIVER="${SESSION_DRIVER:-file}"
+REDIS_HOST="${REDIS_HOST}"
+REDIS_PORT="${REDIS_PORT}"
+REDIS_PASSWORD="${REDIS_PASSWORD}"
+QUEUE_CONNECTION="${QUEUE_CONNECTION:-database}"
 EOF
 
 # Debug: Show generated .env file
