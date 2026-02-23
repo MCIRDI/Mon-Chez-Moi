@@ -85,7 +85,7 @@ export default function Layout() {
 
           <Link
             to="/"
-            className="justify-self-center rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-sm font-extrabold tracking-wide text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-900/40 dark:text-blue-200 dark:hover:bg-blue-900/60 lg:text-base"
+            className="justify-self-center text-sm font-bold text-blue-500 transition-colors hover:text-blue-600 dark:text-blue-300 dark:hover:text-blue-200 lg:text-base"
           >
             {t("nav.brand")}
           </Link>
