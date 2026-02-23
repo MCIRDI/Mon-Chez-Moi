@@ -20,6 +20,7 @@ import {
   storeFavorites,
 } from "@/Services/PropetyService";
 import Loader from "@/ui/Loader";
+import { resolvePropertyImageUrl } from "@/lib/media";
 
 export default function Property() {
   const appContext = useContext(AppContext);
@@ -80,8 +81,6 @@ export default function Property() {
     return years === 1 ? "1 year ago" : `${years} years ago`;
   };
 
-  const API_BASE_URL = "http://127.0.0.1:8000/storage";
-
   const [property, setProperty] = useState<PropertyType | null>(null);
   const [liked, setLiked] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
@@ -89,6 +88,19 @@ export default function Property() {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const { id } = useParams();
+
+  const mainPhotoUrl = resolvePropertyImageUrl(
+    property?.photo1,
+    "/images/MonChezMoi01.jpg",
+  );
+  const secondPhotoUrl = resolvePropertyImageUrl(
+    property?.photo2 || property?.photo1,
+    "/images/MonChezMoi01.jpg",
+  );
+  const thirdPhotoUrl = resolvePropertyImageUrl(
+    property?.photo3 || property?.photo1,
+    "/images/MonChezMoi01.jpg",
+  );
 
   const setAuthForms = useOutletContext<
     React.Dispatch<React.SetStateAction<boolean>> | undefined
@@ -234,19 +246,26 @@ export default function Property() {
                 <div className="flex justify-center gap-2 flex-wrap">
                   {[property.photo1, property.photo2, property.photo3]
                     .filter(Boolean)
-                    .map((photo, index) => (
+                    .map((photo, index) => {
+                      const imageUrl = resolvePropertyImageUrl(
+                        photo,
+                        "/images/MonChezMoi01.jpg",
+                      );
+
+                      return (
                       <img
                         key={index}
-                        src={`${API_BASE_URL}/${photo}`}
+                        src={imageUrl}
                         alt={`Property ${index + 1}`}
-                        onClick={() => setSelectedImage(`${API_BASE_URL}/${photo}`)}
+                        onClick={() => setSelectedImage(imageUrl)}
                         className={`w-20 h-20 md:w-24 md:h-24 object-cover rounded cursor-pointer border-2 ${
-                          selectedImage === `${API_BASE_URL}/${photo}`
+                          selectedImage === imageUrl
                             ? "border-white"
                             : "border-transparent"
                         }`}
                       />
-                    ))}
+                      );
+                    })}
                 </div>
               </div>
             </div>
@@ -256,9 +275,7 @@ export default function Property() {
             <div
               className="w-[96vw] md:w-[90vw] lg:w-[60vw] bg-cover bg-center rounded flex flex-col justify-between p-2"
               style={{
-                backgroundImage: property.photo1
-                  ? `url(${API_BASE_URL}/${property.photo1})`
-                  : "url('/images/MonChezMoi01.jpg')",
+                backgroundImage: `url(${mainPhotoUrl})`,
               }}
             >
               <div className="flex flex-row justify-between">
@@ -325,11 +342,7 @@ export default function Property() {
               <div className="w-full flex flex-row-reverse lg:hidden">
                 <button
                   onClick={() => {
-                    setSelectedImage(
-                      property.photo1
-                        ? `${API_BASE_URL}/${property.photo1}`
-                        : "/images/MonChezMoi01.jpg"
-                    );
+                    setSelectedImage(mainPhotoUrl);
                     setShowGallery(true);
                   }}
                   className="bg-white bg-opacity-75 rounded p-1 w-fit shadow-md flex gap-1 hover:bg-opacity-100 transition-all"
@@ -346,40 +359,20 @@ export default function Property() {
               <div
                 className="h-[50%] rounded-r bg-cover bg-center cursor-pointer hover:opacity-90 transition-opacity"
                 style={{
-                  backgroundImage: property.photo2
-                    ? `url(${API_BASE_URL}/${property.photo2})`
-                    : property.photo1
-                    ? `url(${API_BASE_URL}/${property.photo1})`
-                    : "url('/images/MonChezMoi01.jpg')",
+                  backgroundImage: `url(${secondPhotoUrl})`,
                 }}
                 onClick={() => {
-                  setSelectedImage(
-                    property.photo2
-                      ? `${API_BASE_URL}/${property.photo2}`
-                      : property.photo1
-                      ? `${API_BASE_URL}/${property.photo1}`
-                      : "/images/MonChezMoi01.jpg"
-                  );
+                  setSelectedImage(secondPhotoUrl);
                   setShowGallery(true);
                 }}
               ></div>
               <div
                 className="h-[50%] rounded-r bg-cover bg-center flex flex-col-reverse p-2 cursor-pointer hover:opacity-90 transition-opacity"
                 style={{
-                  backgroundImage: property.photo3
-                    ? `url(${API_BASE_URL}/${property.photo3})`
-                    : property.photo1
-                    ? `url(${API_BASE_URL}/${property.photo1})`
-                    : "url('/images/MonChezMoi01.jpg')",
+                  backgroundImage: `url(${thirdPhotoUrl})`,
                 }}
                 onClick={() => {
-                  setSelectedImage(
-                    property.photo3
-                      ? `${API_BASE_URL}/${property.photo3}`
-                      : property.photo1
-                      ? `${API_BASE_URL}/${property.photo1}`
-                      : "/images/MonChezMoi01.jpg"
-                  );
+                  setSelectedImage(thirdPhotoUrl);
                   setShowGallery(true);
                 }}
               >
@@ -387,11 +380,7 @@ export default function Property() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelectedImage(
-                        property.photo1
-                          ? `${API_BASE_URL}/${property.photo1}`
-                          : "/images/MonChezMoi01.jpg"
-                      );
+                      setSelectedImage(mainPhotoUrl);
                       setShowGallery(true);
                     }}
                     className="bg-white bg-opacity-75 rounded p-1 w-fit shadow-md flex gap-1 hover:bg-opacity-100 transition-all"

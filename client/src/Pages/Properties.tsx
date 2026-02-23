@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || "http://127.0.0.1:8000/storage";
+import { resolvePropertyImageUrl } from "@/lib/media";
 
 interface PropertyProps {
   property: {
@@ -62,9 +61,10 @@ export default function Properties({ property }: PropertyProps) {
       <div
         className="h-[30vh] p-1 rounded bg-cover bg-center"
         style={{
-          backgroundImage: property.photo1
-            ? `url(${API_BASE_URL}/${property.photo1})`
-            : "url('/images/image01.jpg')",
+          backgroundImage: `url(${resolvePropertyImageUrl(
+            property.photo1,
+            "/images/image01.jpg",
+          )})`,
         }}
       >
         <p className="bg-black bg-opacity-75 p-[1px] w-fit text-white text-sm  rounded">
