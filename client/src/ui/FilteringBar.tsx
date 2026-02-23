@@ -260,7 +260,7 @@ export default function FilteringBar({
             <SelectContent className="bg-white text-black">
               <SelectItem value="0">rent & salle</SelectItem>
 
-              <SelectItem value="Rent">Rent</SelectItem>
+              <SelectItem value="rent">Rent</SelectItem>
               <SelectItem value="sale">Sale</SelectItem>
             </SelectContent>
           </Select>

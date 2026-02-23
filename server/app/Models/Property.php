@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -47,6 +48,24 @@ class Property extends Model
     protected $casts = [
         'features' => 'array', // Cast features JSON to an array
     ];
+
+    protected function type(): Attribute
+    {
+        return Attribute::make(
+            // Normalize legacy French values for frontend/API responses.
+            get: fn (?string $value) => match ($value) {
+                'Appartement', 'Appartment' => 'Apartment',
+                'Boutique' => 'Shop',
+                default => $value,
+            },
+            // Persist values compatible with legacy DB constraints.
+            set: fn (?string $value) => match ($value) {
+                'Apartment', 'Appartement', 'Appartment' => 'Appartement',
+                'Shop', 'Boutique' => 'Boutique',
+                default => $value,
+            },
+        );
+    }
 
     /**
      * Define the relationship with the user.

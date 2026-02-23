@@ -13,7 +13,7 @@ interface PropertyFormData {
   exact_address: string;
   number_rooms: number | "";
   space: number | "";
-  type: "House" | "Villa" | "Apartment" | "";
+  type: "House" | "Villa" | "Apartment" | "Shop" | "";
   floor: number | "";
   description: string;
   features: string[];
@@ -329,6 +329,7 @@ export default function PropertyForm() {
           <option value="House">House</option>
           <option value="Villa">Villa</option>
           <option value="Apartment">Apartment</option>
+          <option value="Shop">Shop</option>
         </select>
 
         <textarea

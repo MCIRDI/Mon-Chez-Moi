@@ -10,6 +10,15 @@ use Illuminate\Validation\Rule;
 
 class PropertyController extends Controller
 {
+    private function getTypeQueryValues(string $type): array
+    {
+        return match ($type) {
+            'Apartment', 'Appartement', 'Appartment' => ['Apartment', 'Appartement', 'Appartment'],
+            'Shop', 'Boutique' => ['Shop', 'Boutique'],
+            default => [$type],
+        };
+    }
+
     /**
      * Format validation errors into user-friendly messages
      */
@@ -305,9 +314,7 @@ public function store(Request $request)
         }
 
         if($request->filled('type')){
-
-
-            $query->where('type',$request->type);
+            $query->whereIn('type', $this->getTypeQueryValues($request->type));
         }
         $properties=$query->get();
         return response()->json($properties);
