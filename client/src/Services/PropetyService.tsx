@@ -1,5 +1,4 @@
 import api from "./api";
-import axios from "axios";
 
 export async function fetchProperties() {
   const response = await api.get("/properties");
@@ -30,12 +29,9 @@ export async function filterProperties(
 }
 
 export async function createProperty(property: FormData) {
-  const token = localStorage.getItem("token");
-
   const response = await api.post("/properties", property, {
     headers: {
       "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${token}`, // send token
     },
   });
 
@@ -43,21 +39,13 @@ export async function createProperty(property: FormData) {
 }
 
 export async function updateProperty(id: number, property: FormData) {
-  const token = localStorage.getItem("token");
+  if (!property.get("_method")) {
+    property.append("_method", "PUT");
+  }
 
-  // Create a new axios instance without default headers for FormData
-  const apiInstance = axios.create({
-    baseURL: "http://127.0.0.1:8000/api",
-    timeout: 50000,
-  });
-
-  // Add _method parameter to simulate PUT request
-  property.append('_method', 'PUT');
-
-  const response = await apiInstance.post(`/properties/${id}`, property, {
+  const response = await api.post(`/properties/${id}`, property, {
     headers: {
       "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${token}`,
     },
   });
 
