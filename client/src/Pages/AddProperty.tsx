@@ -82,6 +82,9 @@ const photoLabels: Record<PhotoKey, string> = {
   photo3: "Third Photo",
 };
 
+const fieldClassName =
+  "w-full rounded border border-slate-300 bg-white p-2 text-slate-900 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400";
+
 export default function PropertyForm() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -288,8 +291,10 @@ export default function PropertyForm() {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow rounded">
-      <h2 className="text-2xl font-bold mb-4">{id ? "Edit Property" : "Add Property"}</h2>
+    <div className="mx-auto max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow dark:border-slate-700 dark:bg-slate-900">
+      <h2 className="mb-4 text-2xl font-bold text-slate-900 dark:text-slate-100">
+        {id ? "Edit Property" : "Add Property"}
+      </h2>
 
       {/* Error Display */}
       {validationErrors && (
@@ -302,15 +307,15 @@ export default function PropertyForm() {
 
       {/* Success/Error Message */}
       {confirmationMessage && !confirmationMessage.startsWith("Error:") && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-          <p className="text-green-800">{confirmationMessage}</p>
+        <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-700 dark:bg-green-950/30">
+          <p className="text-green-800 dark:text-green-300">{confirmationMessage}</p>
         </div>
       )}
 
       {/* General Error Message */}
       {confirmationMessage && confirmationMessage.startsWith("Error:") && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-          <p className="text-red-800">{confirmationMessage}</p>
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-700 dark:bg-red-950/30">
+          <p className="text-red-800 dark:text-red-300">{confirmationMessage}</p>
         </div>
       )}
 
@@ -320,7 +325,7 @@ export default function PropertyForm() {
           value={formData.rent_or_sale}
           onChange={handleChange}
           required
-          className="w-full border p-2 rounded"
+          className={fieldClassName}
         >
           <option value="">Rent or Sale</option>
           <option value="rent">Rent</option>
@@ -334,7 +339,7 @@ export default function PropertyForm() {
           onChange={handleChange}
           placeholder="Price"
           required
-          className="w-full border p-2 rounded"
+          className={fieldClassName}
         />
 
         <select
@@ -342,7 +347,7 @@ export default function PropertyForm() {
           onChange={(e) =>
             setFormData((prev) => ({ ...prev, state: e.target.value }))
           }
-          className="w-full border p-2 rounded"
+          className={fieldClassName}
         >
           <option value="">Select State</option>
           {usaStates.map((s) => (
@@ -368,7 +373,7 @@ export default function PropertyForm() {
             type={
               ["number_rooms", "space", "floor"].includes(f) ? "number" : "text"
             }
-            className="w-full border p-2 rounded"
+            className={fieldClassName}
             required
           />
         ))}
@@ -378,7 +383,7 @@ export default function PropertyForm() {
           value={formData.type}
           onChange={handleChange}
           required
-          className="w-full border p-2 rounded"
+          className={fieldClassName}
         >
           <option value="">Property Type</option>
           <option value="House">House</option>
@@ -392,11 +397,11 @@ export default function PropertyForm() {
           value={formData.description}
           onChange={handleChange}
           placeholder="Description"
-          className="w-full border p-2 rounded"
+          className={fieldClassName}
         />
 
         {/* Images */}
-        <div className="flex gap-4 justify-center">
+        <div className="flex justify-center gap-4">
           {(["photo1", "photo2", "photo3"] as PhotoKey[]).map((key) => {
             const selected = !!previews[key];
 
@@ -407,8 +412,8 @@ export default function PropertyForm() {
                 className={`relative w-24 h-24 rounded-lg border-2 flex items-center justify-center cursor-pointer transition
                   ${
                     selected
-                      ? "border-green-500 bg-green-50"
-                      : "border-dashed border-gray-400 hover:border-blue-400"
+                      ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                      : "border-dashed border-slate-400 hover:border-blue-400 dark:border-slate-600"
                   }`}
               >
                 {selected ? (
@@ -420,13 +425,13 @@ export default function PropertyForm() {
                     <button
                       type="button"
                       onClick={() => removePhoto(key)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                      className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white"
                     >
                       <X size={14} />
                     </button>
                   </>
                 ) : (
-                  <div className="flex flex-col items-center text-gray-500">
+                  <div className="flex flex-col items-center text-slate-500 dark:text-slate-300">
                     <ImageIcon size={26} />
                     <span className="text-xs mt-1">Add image</span>
                   </div>
@@ -449,12 +454,12 @@ export default function PropertyForm() {
             <input
               value={f}
               onChange={(e) => updateFeature(i, e.target.value)}
-              className="flex-1 border p-2 rounded"
+              className={`flex-1 ${fieldClassName}`}
             />
             <button
               type="button"
               onClick={() => removeFeature(i)}
-              className="bg-red-500 text-white px-2 rounded"
+              className="rounded bg-red-500 px-2 text-white transition-colors hover:bg-red-600"
             >
               X
             </button>
@@ -464,7 +469,7 @@ export default function PropertyForm() {
         <button
           type="button"
           onClick={addFeature}
-          className="bg-blue-500 text-white px-3 py-1 rounded"
+          className="rounded bg-blue-500 px-3 py-1 text-white transition-colors hover:bg-blue-600"
         >
           Add Feature
         </button>
@@ -472,7 +477,7 @@ export default function PropertyForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-green-500 text-white p-2 rounded disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="flex w-full items-center justify-center gap-2 rounded bg-green-500 p-2 text-white transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isSubmitting ? (
             <>

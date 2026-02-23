@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import AutocompleteSearch from "@/ui/AutocompleteSearch";
+import { useUiSettings } from "@/Context/UiSettingsContext";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { t } = useUiSettings();
 
   function handleSearch(query: string) {
     if (query.trim()) {
@@ -21,25 +23,24 @@ export default function Home() {
           </div>
 
           <p className="text-white font-bold text-4xl drop-shadow-[2px_2px_4px_rgba(0,0,0,0.8)] ">
-            The easiest way to
+            {t("home.heroLine1")}
           </p>
           <p className="text-white font-bold text-4xl drop-shadow-[2px_2px_4px_rgba(0,0,0,0.8)]">
-            find your next address
+            {t("home.heroLine2")}
           </p>
           <AutocompleteSearch 
             onSearch={handleSearch}
+            placeholder={t("home.searchPlaceholder")}
             className="w-[80vw] md:w-[600px]"
           />
         </div>
       </section>
       <section className="px-4 md:px-24 pt-16 flex flex-col items-center">
-        <p className="font-bold text-3xl text-center  text-gray-800">
-          Explore homes on MonChezMoi
+        <p className="font-bold text-3xl text-center text-slate-800 dark:text-slate-100">
+          {t("home.exploreTitle")}
         </p>
-        <p className="py-6 text-center text-gray-800">
-          Take a deep dive and browse homes for sale or rent, original
-          neighborhood photos, resident reviews and local insights to find what
-          is right for you.
+        <p className="py-6 text-center text-slate-700 dark:text-slate-300">
+          {t("home.exploreDescription")}
         </p>
       </section>
       <section className="flex flex-row overflow-x-auto  scrollbar-hide ">
@@ -51,7 +52,7 @@ export default function Home() {
         >
           <p>Washington</p>
           <a>
-            View Homes <span className="text-xl">&gt;</span>
+            {t("home.viewHomes")} <span className="text-xl">&gt;</span>
           </a>
         </div>
         <div
@@ -63,7 +64,7 @@ export default function Home() {
           <div className="state-card mb-[2vh] h-[24vh]  min-h-[150px] bg-[url('/images/image01.jpg')] bg-cover">
             <p>Boston</p>
             <a>
-              View Homes <span className="text-xl">&gt;</span>
+              {t("home.viewHomes")} <span className="text-xl">&gt;</span>
             </a>
           </div>
           <div
@@ -74,7 +75,7 @@ export default function Home() {
           >
             <p>Alabama</p>
             <a>
-              View Homes <span className="text-xl">&gt;</span>
+              {t("home.viewHomes")} <span className="text-xl">&gt;</span>
             </a>
           </div>
         </div>
@@ -87,7 +88,7 @@ export default function Home() {
           <div className="state-card mb-[2vh] h-[24vh]  min-h-[150px] bg-[url('/images/image04.jpg')] bg-cover">
             <p>New York</p>
             <a>
-              View Homes <span className="text-xl">&gt;</span>
+              {t("home.viewHomes")} <span className="text-xl">&gt;</span>
             </a>
           </div>
           <div
@@ -98,7 +99,7 @@ export default function Home() {
           >
             <p>Florida </p>
             <a>
-              View Homes <span className="text-xl">&gt;</span>
+              {t("home.viewHomes")} <span className="text-xl">&gt;</span>
             </a>
           </div>
         </div>
@@ -110,7 +111,7 @@ export default function Home() {
         >
           <p>California</p>
           <a>
-            View Homes <span className="text-xl">&gt;</span>
+            {t("home.viewHomes")} <span className="text-xl">&gt;</span>
           </a>
         </div>
         <div className="ml-[2vh]">
@@ -122,7 +123,7 @@ export default function Home() {
           >
             <p>Texas </p>
             <a>
-              View Homes <span className="text-xl">&gt;</span>
+              {t("home.viewHomes")} <span className="text-xl">&gt;</span>
             </a>
           </div>
           <div
@@ -133,7 +134,7 @@ export default function Home() {
           >
             <p>Nevada </p>
             <a>
-              View Homes <span className="text-xl">&gt;</span>
+              {t("home.viewHomes")} <span className="text-xl">&gt;</span>
             </a>
           </div>
         </div>
@@ -146,7 +147,7 @@ export default function Home() {
           >
             <p>Illinois</p>
             <a>
-              View Homes <span className="text-xl">&gt;</span>
+              {t("home.viewHomes")} <span className="text-xl">&gt;</span>
             </a>
           </div>
           <div
@@ -157,7 +158,7 @@ export default function Home() {
           >
             <p>Massachusetts </p>
             <a>
-              View Homes <span className="text-xl">&gt;</span>
+              {t("home.viewHomes")} <span className="text-xl">&gt;</span>
             </a>
           </div>
         </div>
@@ -169,7 +170,7 @@ export default function Home() {
         >
           <p>Oklahoma</p>
           <a>
-            View Homes <span className="text-xl">&gt;</span>
+            {t("home.viewHomes")} <span className="text-xl">&gt;</span>
           </a>
         </div>
         <div
@@ -181,7 +182,7 @@ export default function Home() {
           <div className="state-card mb-[2vh] h-[24vh]  min-h-[150px]">
             <p>Arizona</p>
             <a>
-              View Homes <span className="text-xl">&gt;</span>
+              {t("home.viewHomes")} <span className="text-xl">&gt;</span>
             </a>
           </div>
           <div
@@ -192,7 +193,7 @@ export default function Home() {
           >
             <p>Pennsylvania </p>
             <a>
-              View Homes <span className="text-xl">&gt;</span>
+              {t("home.viewHomes")} <span className="text-xl">&gt;</span>
             </a>
           </div>
         </div>
@@ -205,7 +206,7 @@ export default function Home() {
           >
             <p>Colorado</p>
             <a>
-              View Homes <span className="text-xl">&gt;</span>
+              {t("home.viewHomes")} <span className="text-xl">&gt;</span>
             </a>
           </div>
           <div
@@ -216,7 +217,7 @@ export default function Home() {
           >
             <p>Hawaii</p>
             <a>
-              View Homes <span className="text-xl">&gt;</span>
+              {t("home.viewHomes")} <span className="text-xl">&gt;</span>
             </a>
           </div>
         </div>
@@ -228,14 +229,12 @@ export default function Home() {
           }}
           className="relative card bg-[#66BB6A]     group"
         >
-          <h1>Buy</h1>
+          <h1>{t("home.buyTitle")}</h1>
           <p>
-            Explore a wide range of properties tailored to your needs. From cozy
-            apartments to luxurious villas, your perfect home is just a click
-            away.
+            {t("home.buyDescription")}
           </p>
           <div className="absolute inset-x-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-black text-center py-2 ">
-            View Properties &gt;
+            {t("home.buyCta")} &gt;
           </div>
         </div>
 
@@ -245,13 +244,12 @@ export default function Home() {
           }}
           className="relative card bg-black text-white  group"
         >
-          <h1>Rent</h1>
+          <h1>{t("home.rentTitle")}</h1>
           <p>
-            Discover budget-friendly rental options in prime locations. Flexible
-            lease terms to suit your lifestyle.
+            {t("home.rentDescription")}
           </p>
           <div className="absolute inset-x-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-center py-2 ">
-            View Properties &gt;
+            {t("home.rentCta")} &gt;
           </div>
         </div>
 
@@ -259,14 +257,12 @@ export default function Home() {
           onClick={() => navigate("/Myproperties")}
           className="relative card bg-[#CE93D8]   group"
         >
-          <h1>My Properties</h1>
+          <h1>{t("home.myPropertiesTitle")}</h1>
           <p>
-            Get the best value for your property with our expert guidance. List
-            your Properties today and reach thousands of potential buyers and
-            tenants.
+            {t("home.myPropertiesDescription")}
           </p>
           <div className="absolute inset-x-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-black text-center py-2 ">
-            View Properties &gt;
+            {t("home.myPropertiesCta")} &gt;
           </div>
         </div>
       </section>
