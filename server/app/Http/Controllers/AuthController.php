@@ -50,7 +50,7 @@ class AuthController extends Controller
                 'details' => $e->errors(),
                 'request_data' => $request->all()
             ], 422);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error('Registration error', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -76,7 +76,7 @@ public function login(Request $request){
              ],
              'token' => $token,
             ], 200); // 200 OK
-     }catch (\Exception $e) {
+     }catch (\Throwable $e) {
             //if i do not add the try catch laravel dont return the errors when validating $filds
         return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -124,7 +124,7 @@ public function forgotPassword(Request $request)
             'message' => 'The provided email address was not found in our system.',
             'errors' => $e->errors(),
         ], 422);
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         \Log::error('Password reset error: ' . $e->getMessage());
         return response()->json([
             'message' => 'An error occurred while processing your request.',
@@ -192,7 +192,7 @@ public function resetPassword(Request $request)
             'message' => 'Validation failed.',
             'errors' => $e->errors(),
         ], 422);
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         \Log::error('Password reset error: ' . $e->getMessage());
         return response()->json([
             'message' => 'An error occurred while resetting your password.',
