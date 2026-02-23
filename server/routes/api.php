@@ -5,6 +5,11 @@ use App\Http\Controllers\PropertyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// Handle OPTIONS requests for CORS preflight
+Route::options('{any}', function () {
+    return response()->json([], 200);
+})->where('any', '.*');
+
 // Health check endpoint
 Route::get('/health', function () {
     return response()->json([
@@ -124,6 +129,7 @@ Route::get('/MyProperties',[PropertyController::class,'myProperties'])->middlewa
 Route::get('/properties/filter', [PropertyController::class, 'getFilteredProperties']);
 
 
+Route::get('/properties/{id}/photo/{slot}', [PropertyController::class, 'photo']);
 Route::get('/properties/{id}',[PropertyController::class,'show']);
 Route::post('/properties', [PropertyController::class, 'store'])->middleware(('auth:sanctum'));//create a property
 Route::match(['put', 'post'], '/properties/{id}', [PropertyController::class, 'update'])->middleware(('auth:sanctum')); // update a property

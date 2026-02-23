@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { resolvePropertyImageUrl } from "@/lib/media";
+import { resolvePropertyPhotoUrl } from "@/lib/media";
 
 interface PropertyProps {
   property: {
@@ -61,7 +61,9 @@ export default function Properties({ property }: PropertyProps) {
       <div
         className="h-[30vh] p-1 rounded bg-cover bg-center"
         style={{
-          backgroundImage: `url(${resolvePropertyImageUrl(
+          backgroundImage: `url(${resolvePropertyPhotoUrl(
+            property.id,
+            "photo1",
             property.photo1,
             "/images/image01.jpg",
           )})`,

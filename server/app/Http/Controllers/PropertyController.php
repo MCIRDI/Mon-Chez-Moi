@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Favorite;
 use App\Models\Property;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rule;
 
 class PropertyController extends Controller
 {
+    private array $photoSlots = ['photo1', 'photo2', 'photo3'];
+
     private function getTypeQueryValues(string $type): array
     {
         return match ($type) {
@@ -17,6 +20,23 @@ class PropertyController extends Controller
             'Shop', 'Boutique' => ['Shop', 'Boutique'],
             default => [$type],
         };
+    }
+
+    private function persistUploadedPhotos(array &$validatedData, Request $request): void
+    {
+        foreach ($this->photoSlots as $photoKey) {
+            if (!$request->hasFile($photoKey)) {
+                continue;
+            }
+
+            $file = $request->file($photoKey);
+            $path = $file->store('properties', 'public');
+            $raw = file_get_contents($file->getRealPath());
+
+            $validatedData[$photoKey] = $path;
+            $validatedData["{$photoKey}_data"] = base64_encode((string) $raw);
+            $validatedData["{$photoKey}_mime"] = $file->getMimeType() ?: 'image/jpeg';
+        }
     }
 
     /**
@@ -149,12 +169,8 @@ public function store(Request $request)
             'features.*' => 'string|max:30',
         ]);
 
-        // Save uploaded images to storage and store paths
-        foreach (['photo1', 'photo2', 'photo3'] as $photoKey) {
-            if ($request->hasFile($photoKey)) {
-                $validatedData[$photoKey] = $request->file($photoKey)->store('properties', 'public');
-            }
-        }
+        // Save uploaded images to storage and keep DB backup copies.
+        $this->persistUploadedPhotos($validatedData, $request);
 
         // Attach authenticated user ID
         $validatedData['id_user'] = auth()->id();
@@ -200,6 +216,60 @@ public function store(Request $request)
             ], 500);
     }    }
 
+    public function photo(string $id, string $slot)
+    {
+        try {
+            if (!in_array($slot, $this->photoSlots, true)) {
+                return response()->json([
+                    'message' => 'Photo not found',
+                ], 404);
+            }
+
+            $property = Property::find($id);
+            if (!$property) {
+                return response()->json([
+                    'message' => 'Property not found',
+                ], 404);
+            }
+
+            $dataColumn = "{$slot}_data";
+            $mimeColumn = "{$slot}_mime";
+            $fallbackMime = 'image/jpeg';
+
+            if (!empty($property->{$dataColumn})) {
+                return response(base64_decode($property->{$dataColumn}), 200)
+                    ->header('Content-Type', $property->{$mimeColumn} ?: $fallbackMime)
+                    ->header('Cache-Control', 'public, max-age=31536000');
+            }
+
+            $relativePath = $property->{$slot};
+            if ($relativePath && Storage::disk('public')->exists($relativePath)) {
+                $absolutePath = Storage::disk('public')->path($relativePath);
+                $raw = file_get_contents($absolutePath);
+                $mime = Storage::disk('public')->mimeType($relativePath) ?: $fallbackMime;
+
+                // Backfill DB backup when file exists on disk.
+                $property->update([
+                    $dataColumn => base64_encode((string) $raw),
+                    $mimeColumn => $mime,
+                ]);
+
+                return response($raw, 200)
+                    ->header('Content-Type', $mime)
+                    ->header('Cache-Control', 'public, max-age=31536000');
+            }
+
+            return response()->json([
+                'message' => 'Photo not found',
+            ], 404);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'An error occurred while retrieving property photo',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     /**
      * Update the specified resource in storage.
      */
@@ -239,12 +309,8 @@ public function store(Request $request)
             ], 403); // 403 Forbidden
            }
 
-        // Save uploaded images to storage and store paths
-        foreach (['photo1', 'photo2', 'photo3'] as $photoKey) {
-            if ($request->hasFile($photoKey)) {
-                $validatedData[$photoKey] = $request->file($photoKey)->store('properties', 'public');
-            }
-        }
+        // Save uploaded images to storage and keep DB backup copies.
+        $this->persistUploadedPhotos($validatedData, $request);
 
         \Log::info('Validated data: ', $validatedData);
         

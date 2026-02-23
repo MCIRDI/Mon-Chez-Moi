@@ -38,6 +38,12 @@ class Property extends Model
         'photo1', // principal image
         'photo2', // secondary image
         'photo3', // secondary image
+        'photo1_data',
+        'photo1_mime',
+        'photo2_data',
+        'photo2_mime',
+        'photo3_data',
+        'photo3_mime',
     ];
 
     /**
@@ -47,6 +53,15 @@ class Property extends Model
      */
     protected $casts = [
         'features' => 'array', // Cast features JSON to an array
+    ];
+
+    protected $hidden = [
+        'photo1_data',
+        'photo1_mime',
+        'photo2_data',
+        'photo2_mime',
+        'photo3_data',
+        'photo3_mime',
     ];
 
     protected function type(): Attribute

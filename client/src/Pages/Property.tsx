@@ -20,7 +20,7 @@ import {
   storeFavorites,
 } from "@/Services/PropetyService";
 import Loader from "@/ui/Loader";
-import { resolvePropertyImageUrl } from "@/lib/media";
+import { resolvePropertyPhotoUrl } from "@/lib/media";
 
 export default function Property() {
   const appContext = useContext(AppContext);
@@ -89,18 +89,28 @@ export default function Property() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const mainPhotoUrl = resolvePropertyImageUrl(
+  const mainPhotoUrl = resolvePropertyPhotoUrl(
+    property?.id,
+    "photo1",
     property?.photo1,
     "/images/MonChezMoi01.jpg",
   );
-  const secondPhotoUrl = resolvePropertyImageUrl(
-    property?.photo2 || property?.photo1,
-    "/images/MonChezMoi01.jpg",
-  );
-  const thirdPhotoUrl = resolvePropertyImageUrl(
-    property?.photo3 || property?.photo1,
-    "/images/MonChezMoi01.jpg",
-  );
+  const secondPhotoUrl = property?.photo2
+    ? resolvePropertyPhotoUrl(
+        property?.id,
+        "photo2",
+        property?.photo2,
+        "/images/MonChezMoi01.jpg",
+      )
+    : mainPhotoUrl;
+  const thirdPhotoUrl = property?.photo3
+    ? resolvePropertyPhotoUrl(
+        property?.id,
+        "photo3",
+        property?.photo3,
+        "/images/MonChezMoi01.jpg",
+      )
+    : mainPhotoUrl;
 
   const setAuthForms = useOutletContext<
     React.Dispatch<React.SetStateAction<boolean>> | undefined
@@ -244,26 +254,34 @@ export default function Property() {
                   />
                 )}
                 <div className="flex justify-center gap-2 flex-wrap">
-                  {[property.photo1, property.photo2, property.photo3]
-                    .filter(Boolean)
-                    .map((photo, index) => {
-                      const imageUrl = resolvePropertyImageUrl(
-                        photo,
+                  {(
+                    [
+                      { slot: "photo1", value: property.photo1 },
+                      { slot: "photo2", value: property.photo2 },
+                      { slot: "photo3", value: property.photo3 },
+                    ] as const
+                  )
+                    .filter((item) => Boolean(item.value))
+                    .map((item, index) => {
+                      const imageUrl = resolvePropertyPhotoUrl(
+                        property.id,
+                        item.slot,
+                        item.value,
                         "/images/MonChezMoi01.jpg",
                       );
 
                       return (
-                      <img
-                        key={index}
-                        src={imageUrl}
-                        alt={`Property ${index + 1}`}
-                        onClick={() => setSelectedImage(imageUrl)}
-                        className={`w-20 h-20 md:w-24 md:h-24 object-cover rounded cursor-pointer border-2 ${
-                          selectedImage === imageUrl
-                            ? "border-white"
-                            : "border-transparent"
-                        }`}
-                      />
+                        <img
+                          key={`${item.slot}-${index}`}
+                          src={imageUrl}
+                          alt={`Property ${index + 1}`}
+                          onClick={() => setSelectedImage(imageUrl)}
+                          className={`w-20 h-20 md:w-24 md:h-24 object-cover rounded cursor-pointer border-2 ${
+                            selectedImage === imageUrl
+                              ? "border-white"
+                              : "border-transparent"
+                          }`}
+                        />
                       );
                     })}
                 </div>
