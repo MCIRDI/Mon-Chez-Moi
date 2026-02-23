@@ -1,9 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+use Carbon\Carbon;
 use Hash;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use App\Notifications\PasswordResetNotification;
@@ -98,12 +101,13 @@ public function forgotPassword(Request $request)
         ]);
 
         $user = User::where('email', $request->email)->first();
+        $passwordResetTable = config('auth.passwords.users.table', 'password_reset_tokens');
         
         // Generate password reset token
         $token = Str::random(60);
         
-        // Store the token in password_resets table
-        \DB::table('password_resets')->updateOrInsert(
+        // Store the token in configured password reset table.
+        DB::table($passwordResetTable)->updateOrInsert(
             ['email' => $user->email],
             [
                 'email' => $user->email,
@@ -125,7 +129,7 @@ public function forgotPassword(Request $request)
             'errors' => $e->errors(),
         ], 422);
     } catch (\Throwable $e) {
-        \Log::error('Password reset error: ' . $e->getMessage());
+        Log::error('Password reset error: ' . $e->getMessage());
         return response()->json([
             'message' => 'An error occurred while processing your request.',
             'error' => $e->getMessage(),
@@ -141,9 +145,10 @@ public function resetPassword(Request $request)
             'email' => 'required|email|exists:users,email',
             'password' => 'required|min:8|confirmed',
         ]);
+        $passwordResetTable = config('auth.passwords.users.table', 'password_reset_tokens');
 
         // Find the password reset record
-        $resetRecord = \DB::table('password_resets')
+        $resetRecord = DB::table($passwordResetTable)
             ->where('email', $request->email)
             ->first();
 
@@ -162,9 +167,9 @@ public function resetPassword(Request $request)
 
         // Check if token has expired (default 60 minutes)
         $expiresAt = now()->subMinutes(config('auth.passwords.users.expire', 60));
-        if ($resetRecord->created_at < $expiresAt) {
+        if (Carbon::parse($resetRecord->created_at)->lt($expiresAt)) {
             // Delete expired token
-            \DB::table('password_resets')
+            DB::table($passwordResetTable)
                 ->where('email', $request->email)
                 ->delete();
             
@@ -179,7 +184,7 @@ public function resetPassword(Request $request)
         $user->save();
 
         // Delete the password reset record
-        \DB::table('password_resets')
+        DB::table($passwordResetTable)
             ->where('email', $request->email)
             ->delete();
         
@@ -193,7 +198,7 @@ public function resetPassword(Request $request)
             'errors' => $e->errors(),
         ], 422);
     } catch (\Throwable $e) {
-        \Log::error('Password reset error: ' . $e->getMessage());
+        Log::error('Password reset error: ' . $e->getMessage());
         return response()->json([
             'message' => 'An error occurred while resetting your password.',
             'error' => $e->getMessage(),

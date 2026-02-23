@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import LoadingSpinner from "@/ui/LoadingSpinner";
 import { forgotPassword } from "@/Services/AuthService";
@@ -11,7 +11,6 @@ export default function ForgotPassword() {
   const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
-  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     // Check if user came from mobile auth page
@@ -24,18 +23,6 @@ export default function ForgotPassword() {
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  useEffect(() => {
-    const token = searchParams.get("token");
-    const email = searchParams.get("email");
-    
-    if (!token || !email) {
-      setMessage("Invalid password reset link. Please request a new one.");
-      setIsSuccess(false);
-    } else {
-      setEmail(decodeURIComponent(email));
-    }
-  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
