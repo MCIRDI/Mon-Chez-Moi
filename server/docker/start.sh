@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 # Create required directories
 mkdir -p /var/log/php-fpm
