@@ -4,18 +4,25 @@ import Loader from "@/ui/Loader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Property } from "./Search";
+import { useUiSettings } from "@/Context/UiSettingsContext";
 
 export default function MyProperties() {
   const [Propertiesliste, setPropertiesliste] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
+  const itemsPerPage = 5;
   const navigate = useNavigate();
+  const { t } = useUiSettings();
 
   useEffect(() => {
     const fetchAndSetPropertiesliste = async () => {
       try {
-        setPropertiesliste(await Myproperties());
+        const properties = await Myproperties();
+        const sortedProperties = [...properties].sort(
+          (a: Property, b: Property) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        );
+        setPropertiesliste(sortedProperties);
       } catch (error) {
         console.error("Error fetching properties:", error);
       } finally {
@@ -37,7 +44,7 @@ export default function MyProperties() {
   };
 
   if (loading) {
-    return <Loader message="Loading your properties..." />;
+    return <Loader message={t("myProperties.loading")} />;
   }
 
   return (
@@ -45,13 +52,13 @@ export default function MyProperties() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div
           onClick={() => navigate("/AddProperty")}
-          className="bg-blue-100 min-h-[30vh] w-[95vw] md:w-[45vw] lg:w-[32vw] flex flex-col justify-around items-center p-2 rounded hover:cursor-pointer shadow-lg"
+          className="flex min-h-[30vh] w-[95vw] flex-col items-center justify-around rounded bg-blue-100 p-2 shadow-lg transition-transform hover:cursor-pointer hover:scale-[1.01] dark:bg-slate-800 md:w-[45vw] lg:w-[32vw]"
         >
-          <p className="font-bold ">Add a new property</p>
-          <p className="text-center">
-            Get the best value for your property with our expert guidance
+          <p className="font-bold">{t("myProperties.addTitle")}</p>
+          <p className="text-center text-sm text-slate-700 dark:text-slate-200">
+            {t("myProperties.addDescription")}
           </p>
-          <div className="w-10 h-10 flex items-center justify-center bg-blue-200 rounded-full  shadow-lg">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200 text-xl shadow-lg dark:bg-slate-700">
             +
           </div>
         </div>
@@ -67,23 +74,23 @@ export default function MyProperties() {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+            className="rounded border border-slate-300 px-3 py-1 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:hover:bg-slate-800"
           >
-            Previous
+            {t("myProperties.previous")}
           </button>
           
           <div className="flex gap-1">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
               <button
                 key={pageNumber}
-                onClick={() => handlePageChange(pageNumber)}
-                className={`px-3 py-1 rounded border ${
-                  currentPage === pageNumber
-                    ? 'bg-blue-500 text-white border-blue-500'
-                    : 'border-gray-300 hover:bg-gray-100'
-                }`}
-              >
-                {pageNumber}
+              onClick={() => handlePageChange(pageNumber)}
+              className={`px-3 py-1 rounded border ${
+                currentPage === pageNumber
+                    ? "border-blue-500 bg-blue-500 text-white"
+                    : "border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
+              }`}
+            >
+              {pageNumber}
               </button>
             ))}
           </div>
@@ -91,9 +98,9 @@ export default function MyProperties() {
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+            className="rounded border border-slate-300 px-3 py-1 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:hover:bg-slate-800"
           >
-            Next
+            {t("myProperties.next")}
           </button>
         </div>
       )}

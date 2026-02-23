@@ -73,6 +73,14 @@ const usaStates = [
 ];
 
 type PhotoKey = "photo1" | "photo2" | "photo3";
+const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
+const MAX_IMAGE_SIZE_LABEL = "10MB";
+
+const photoLabels: Record<PhotoKey, string> = {
+  photo1: "Main Photo",
+  photo2: "Second Photo",
+  photo3: "Third Photo",
+};
 
 export default function PropertyForm() {
   const navigate = useNavigate();
@@ -145,8 +153,25 @@ export default function PropertyForm() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      setPhotos((prev) => ({ ...prev, [key]: null }));
+      setPreviews((prev) => ({ ...prev, [key]: null }));
+      setValidationErrors([
+        {
+          field: photoLabels[key],
+          message: `Image is too large. Maximum file size is ${MAX_IMAGE_SIZE_LABEL}.`,
+        },
+      ]);
+      setConfirmationMessage("");
+      e.target.value = "";
+      return;
+    }
+
     setPhotos((prev) => ({ ...prev, [key]: file }));
     setPreviews((prev) => ({ ...prev, [key]: URL.createObjectURL(file) }));
+    if (validationErrors) {
+      setValidationErrors(null);
+    }
   };
 
   const removePhoto = (key: PhotoKey) => {
@@ -217,8 +242,38 @@ export default function PropertyForm() {
       console.error("Error status:", error.response?.status);
       
       // Handle validation errors
-      if (error.response?.status === 422 && error.response?.data?.error_details) {
-        setValidationErrors(error.response.data.error_details);
+      if (error.response?.status === 422) {
+        const responseData = error.response?.data;
+
+        if (Array.isArray(responseData?.error_details) && responseData.error_details.length > 0) {
+          setValidationErrors(responseData.error_details);
+          setConfirmationMessage("");
+        } else if (responseData?.errors && typeof responseData.errors === "object") {
+          const flattenedErrors = Object.entries(responseData.errors).flatMap(([field, messages]) => {
+            const safeMessages = Array.isArray(messages) ? messages : [String(messages)];
+            return safeMessages.map((message) => ({
+              field: field.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()),
+              message: String(message),
+            }));
+          });
+
+          setValidationErrors(
+            flattenedErrors.length > 0
+              ? flattenedErrors
+              : [{ field: "Validation", message: "Please review the form fields." }],
+          );
+          setConfirmationMessage("");
+        } else {
+          setConfirmationMessage("Error: Validation failed. Please review your input.");
+          setValidationErrors(null);
+        }
+      } else if (error.response?.status === 413) {
+        setValidationErrors([
+          {
+            field: "Images",
+            message: `Upload payload is too large. Please use files up to ${MAX_IMAGE_SIZE_LABEL} each.`,
+          },
+        ]);
         setConfirmationMessage("");
       } else if (error.response?.data?.message) {
         setConfirmationMessage(`Error: ${error.response.data.message}`);

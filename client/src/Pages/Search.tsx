@@ -4,6 +4,7 @@ import FilteringBar from "../ui/FilteringBar";
 import Properties from "./Properties";
 import { useParams } from "react-router-dom";
 import Loader from "@/ui/Loader";
+import { useUiSettings } from "@/Context/UiSettingsContext";
 
 export type Property = {
   id: number;
@@ -30,8 +31,9 @@ export default function Search() {
   const [Propertiesliste, setPropertiesliste] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
+  const itemsPerPage = 6;
   const { filterFromParameter } = useParams<string>();
+  const { t } = useUiSettings();
 
   useEffect(() => {
     const fetchAndSetPropertiesliste = async () => {
@@ -76,7 +78,7 @@ export default function Search() {
   };
 
   if (loading) {
-    return <Loader message="Loading properties..." />;
+    return <Loader message={t("search.loading")} />;
   }
 
   return (
@@ -98,9 +100,9 @@ export default function Search() {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+                  className="rounded border border-slate-300 px-3 py-1 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:hover:bg-slate-800"
                 >
-                  Previous
+                  {t("search.previous")}
                 </button>
                 
                 <div className="flex gap-1">
@@ -110,8 +112,8 @@ export default function Search() {
                       onClick={() => handlePageChange(pageNumber)}
                       className={`px-3 py-1 rounded border ${
                         currentPage === pageNumber
-                          ? 'bg-blue-500 text-white border-blue-500'
-                          : 'border-gray-300 hover:bg-gray-100'
+                          ? "border-blue-500 bg-blue-500 text-white"
+                          : "border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
                       }`}
                     >
                       {pageNumber}
@@ -122,17 +124,17 @@ export default function Search() {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+                  className="rounded border border-slate-300 px-3 py-1 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:hover:bg-slate-800"
                 >
-                  Next
+                  {t("search.next")}
                 </button>
               </div>
             )}
           </>
         ) : (
           <div className="flex items-center justify-center h-[50vh] w-full">
-            <p className="text-gray-500 text-lg text-center">
-              No properties found matching your filters. Try adjusting your search criteria.
+            <p className="text-lg text-slate-500 text-center dark:text-slate-300">
+              {t("search.noProperties")}
             </p>
           </div>
         )}

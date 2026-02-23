@@ -2,6 +2,8 @@ import { FC, useState, useRef, useEffect, useContext } from "react";
 import { Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "@/Context/AppContext";
+import UiControls from "@/ui/UiControls";
+import { useUiSettings } from "@/Context/UiSettingsContext";
 
 interface MenuItem {
   name: string;
@@ -14,6 +16,7 @@ const Sidebar: FC = () => {
   const navigate = useNavigate();
   const toggleSidebar = () => setIsOpen((prev) => !prev);
   const appContext = useContext(AppContext);
+  const { t } = useUiSettings();
 
   const user = appContext?.user;
 
@@ -37,13 +40,13 @@ const Sidebar: FC = () => {
   }, [isOpen]);
 
   const menuItems: MenuItem[] = [
-    { name: "Home", link: "/" },
-    { name: "Buy", link: "Search/buy" },
-    { name: "Rent", link: "Search/rent" },
-    { name: "Search", link: "/Search" },
-    { name: "My properties", link: user ? "Myproperties" : "/AuthPageMobile" },
-    { name: "Favorites", link: user ? "favorites" : "/AuthPageMobile" },
-    ...(!user ? [{ name: "Sign In", link: "/AuthPageMobile" }] : []),
+    { name: t("nav.home"), link: "/" },
+    { name: t("nav.buy"), link: "Search/buy" },
+    { name: t("nav.rent"), link: "Search/rent" },
+    { name: t("nav.search"), link: "/Search" },
+    { name: t("nav.myProperties"), link: user ? "Myproperties" : "/AuthPageMobile" },
+    { name: t("nav.favorites"), link: user ? "favorites" : "/AuthPageMobile" },
+    ...(!user ? [{ name: t("nav.signIn"), link: "/AuthPageMobile" }] : []),
   ];
 
   return (
@@ -51,7 +54,7 @@ const Sidebar: FC = () => {
       {!isOpen && (
         <button
           onClick={toggleSidebar}
-          className="absolute left-2 top-4 w-8 h-8 border border-gray-700 rounded-full flex items-center justify-center bg-gray-800"
+          className="absolute left-2 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-slate-700 bg-slate-900"
         >
           <Menu className="text-white" size={30} />
         </button>
@@ -68,7 +71,7 @@ const Sidebar: FC = () => {
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed top-0 left-0 flex flex-col h-full w-[40vw] gap-6 rounded transition-transform duration-300 bg-slate-100 z-[9999]
+        className={`fixed top-0 left-0 z-[9999] flex h-full w-[70vw] max-w-[300px] flex-col gap-4 rounded-r-xl bg-slate-100 transition-transform duration-300 dark:bg-slate-900
         ${isOpen ? "translate-x-0 pointer-events-auto" : "-translate-x-full pointer-events-none"}`}
       >
         <p
@@ -76,12 +79,15 @@ const Sidebar: FC = () => {
             setIsOpen(false);
             navigate("/");
           }}
-          className="font-bold px-5 py-6 shrink-0 cursor-pointer"
+          className="shrink-0 cursor-pointer px-5 py-6 font-bold"
         >
-          <span className="text-blue-500 text-2xl">M</span>on chez moi
+          <span className="text-2xl text-blue-500">M</span>on chez moi
         </p>
+        <div className="px-4">
+          <UiControls compact />
+        </div>
 
-        <ul className="flex-1 overflow-y-auto px-3 pb-6 flex flex-col gap-2">
+        <ul className="flex flex-1 flex-col gap-2 overflow-y-auto px-3 pb-6">
           {menuItems.map((item, index) => (
             <li
               onClick={() => {
@@ -89,7 +95,7 @@ const Sidebar: FC = () => {
                 setIsOpen(false);
               }}
               key={index}
-              className="flex items-center gap-x-4 p-2 text-sm hover:text-blue-500 hover:underline duration-200 cursor-pointer border-b border-gray-300"
+              className="cursor-pointer border-b border-slate-300 p-2 text-sm text-slate-700 duration-200 hover:text-blue-500 hover:underline dark:border-slate-700 dark:text-slate-200"
             >
               <span>{item.name}</span>
             </li>

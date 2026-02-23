@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Properties from "./Properties";
 import { Property } from "./Search";
 import Loader from "@/ui/Loader";
+import { useUiSettings } from "@/Context/UiSettingsContext";
 
 type FavoriteItem = {
   id: number;
@@ -14,6 +15,7 @@ type FavoriteItem = {
 export default function Favorites() {
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useUiSettings();
 
   useEffect(() => {
     async function fetchFavorites() {
@@ -31,14 +33,14 @@ export default function Favorites() {
   }, []);
 
   if (loading) {
-    return <Loader message="Loading favorites..." />;
+    return <Loader message={t("favorites.loading")} />;
   }
 
   return (
     <>
       {favorites && favorites.length > 0 ? (
         <div className="m-2 min-h-[60vh]">
-          <h2 className="text-2xl font-bold mb-4">My Favorites</h2>
+          <h2 className="mb-4 text-2xl font-bold">{t("favorites.title")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {favorites.map((element) => (
               <Properties key={element.id} property={element.property} />
@@ -47,8 +49,8 @@ export default function Favorites() {
         </div>
       ) : (
         <div className="flex items-center justify-center h-[70vh] w-full">
-          <p className="text-gray-500 text-lg text-center">
-            You don't have any favorites yet
+          <p className="text-lg text-slate-500 text-center dark:text-slate-300">
+            {t("favorites.empty")}
           </p>
         </div>
       )}

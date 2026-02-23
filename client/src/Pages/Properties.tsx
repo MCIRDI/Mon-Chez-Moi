@@ -50,16 +50,18 @@ function formatRelativeTime(isoDate: string) {
 
 export default function Properties({ property }: PropertyProps) {
   const navigate = useNavigate();
+
   function goToProperty() {
     navigate(`/search/property/${property.id}`);
   }
+
   return (
     <div
       onClick={goToProperty}
-      className="py-2 pl-1 w-[95vw] md:w-[45vw] lg:w-[32vw] flex flex-col gap-1 shadow-lg hover:cursor-pointer"
+      className="flex w-[95vw] flex-col gap-1 bg-white py-2 pl-1 shadow-lg transition-colors hover:cursor-pointer dark:bg-slate-900 md:w-[45vw] lg:w-[32vw]"
     >
       <div
-        className="h-[30vh] p-1 rounded bg-cover bg-center"
+        className="h-[30vh] rounded bg-cover bg-center p-1"
         style={{
           backgroundImage: `url(${resolvePropertyPhotoUrl(
             property.id,
@@ -69,34 +71,28 @@ export default function Properties({ property }: PropertyProps) {
           )})`,
         }}
       >
-        <p className="bg-black bg-opacity-75 p-[1px] w-fit text-white text-sm  rounded">
+        <p className="w-fit rounded bg-black bg-opacity-75 p-[1px] text-sm text-white">
           {formatRelativeTime(property.created_at)}
         </p>
       </div>
-      <div className="p-1 w-[100%] ">
-        <div className=" p-1 flex flex-row justify-between ">
-          <p>
-            {property.type.charAt(0).toUpperCase() + property.type.slice(1)}
-          </p>
-          <p className="text-green-900">{property.price}</p>
+
+      <div className="w-full p-1">
+        <div className="flex flex-row justify-between p-1">
+          <p>{property.type.charAt(0).toUpperCase() + property.type.slice(1)}</p>
+          <p className="text-green-700 dark:text-green-300">{property.price}</p>
         </div>
         <div className="flex flex-row justify-between">
           <p>
-            {property.number_rooms} rooms | {property.floor} floor |{" "}
-            {property.space}m²
+            {property.number_rooms} rooms | {property.floor} floor | {property.space}m2
           </p>
-          <p className="text-green-950 ">
-            {property.rent_or_sale.charAt(0).toUpperCase() +
-              property.rent_or_sale.slice(1)}
+          <p className="text-green-900 dark:text-green-200">
+            {property.rent_or_sale.charAt(0).toUpperCase() + property.rent_or_sale.slice(1)}
           </p>
         </div>
         <p>
-          {property.exact_address.charAt(0).toUpperCase() +
-            property.exact_address.slice(1)}
-          ,{" "}
-          {property.municipality.charAt(0).toUpperCase() +
-            property.municipality.slice(1)}
-          , {property.state.charAt(0).toUpperCase() + property.state.slice(1)}
+          {property.exact_address.charAt(0).toUpperCase() + property.exact_address.slice(1)},{" "}
+          {property.municipality.charAt(0).toUpperCase() + property.municipality.slice(1)},{" "}
+          {property.state.charAt(0).toUpperCase() + property.state.slice(1)}
         </p>
       </div>
     </div>

@@ -30,12 +30,21 @@ class PropertyController extends Controller
             }
 
             $file = $request->file($photoKey);
-            $path = $file->store('properties', 'public');
             $raw = file_get_contents($file->getRealPath());
+            $path = $file->store('properties', 'public');
+
+            // Uploaded temp files can disappear after store(); fallback to saved file.
+            if (($raw === false || $raw === '') && Storage::disk('public')->exists($path)) {
+                $raw = Storage::disk('public')->get($path);
+            }
 
             $validatedData[$photoKey] = $path;
-            $validatedData["{$photoKey}_data"] = base64_encode((string) $raw);
-            $validatedData["{$photoKey}_mime"] = $file->getMimeType() ?: 'image/jpeg';
+            $validatedData["{$photoKey}_data"] = ($raw === false || $raw === '')
+                ? null
+                : base64_encode((string) $raw);
+            $validatedData["{$photoKey}_mime"] = ($raw === false || $raw === '')
+                ? null
+                : ($file->getMimeType() ?: 'image/jpeg');
         }
     }
 
@@ -100,9 +109,14 @@ class PropertyController extends Controller
             'address', 'number of rooms', 'space', 'property type', 'floor', 'description'
         ], $message);
         
-        // Add file size information for photo errors
-        if (strpos($message, 'photo') !== false && strpos($message, 'max') !== false) {
-            $message .= ' (Maximum file size is 10MB)';
+        // Add explicit size hint for upload/size-related photo errors.
+        if (strpos($message, 'photo') !== false && (
+            strpos($message, 'max') !== false ||
+            strpos($message, 'greater than') !== false ||
+            strpos($message, 'kilobytes') !== false ||
+            strpos($message, 'failed to upload') !== false
+        )) {
+            $message .= ' (Maximum file size is 10MB).';
         }
         
         return ucfirst($message);
@@ -167,6 +181,13 @@ public function store(Request $request)
             'description' => 'nullable|string|max:1000',
             'features' => 'nullable|array',
             'features.*' => 'string|max:30',
+        ], [
+            'photo1.max' => 'The main photo must be 10MB or smaller.',
+            'photo2.max' => 'The second photo must be 10MB or smaller.',
+            'photo3.max' => 'The third photo must be 10MB or smaller.',
+            'photo1.uploaded' => 'The main photo could not be uploaded. Please use a file up to 10MB.',
+            'photo2.uploaded' => 'The second photo could not be uploaded. Please use a file up to 10MB.',
+            'photo3.uploaded' => 'The third photo could not be uploaded. Please use a file up to 10MB.',
         ]);
 
         // Save uploaded images to storage and keep DB backup copies.
@@ -295,6 +316,13 @@ public function store(Request $request)
                   'description' => 'nullable|string|max:1000',
                   'features' => 'nullable|array',
                   'features.*' => 'string|max:30', // Each item in the array must be a string of max 255 characters
+              ], [
+                  'photo1.max' => 'The main photo must be 10MB or smaller.',
+                  'photo2.max' => 'The second photo must be 10MB or smaller.',
+                  'photo3.max' => 'The third photo must be 10MB or smaller.',
+                  'photo1.uploaded' => 'The main photo could not be uploaded. Please use a file up to 10MB.',
+                  'photo2.uploaded' => 'The second photo could not be uploaded. Please use a file up to 10MB.',
+                  'photo3.uploaded' => 'The third photo could not be uploaded. Please use a file up to 10MB.',
               ]);
           $property= Property::find($id);
            if(! $property){

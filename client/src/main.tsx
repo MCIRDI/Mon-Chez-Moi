@@ -3,11 +3,14 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
 import { AppContextProvider } from "./Context/AppContext.tsx";
+import { UiSettingsProvider } from "./Context/UiSettingsContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AppContextProvider>
-      <App />
-    </AppContextProvider>
+    <UiSettingsProvider>
+      <AppContextProvider>
+        <App />
+      </AppContextProvider>
+    </UiSettingsProvider>
   </StrictMode>
 );

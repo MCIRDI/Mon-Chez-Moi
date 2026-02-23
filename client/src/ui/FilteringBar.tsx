@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { Property } from "../Pages/Search";
 import { ListFilterIcon } from "lucide-react";
 import { useParams } from "react-router-dom";
+import { useUiSettings } from "@/Context/UiSettingsContext";
 
 type Filter = Record<string, string | number>;
 type FilteringBarProps = {
@@ -23,6 +24,7 @@ export default function FilteringBar({
   const [filters, setFilters] = useState<Filter>({ order: "Newest" });
   const [open, setopen] = useState(false);
   const [rentSaleButton, setRentSaleButton] = useState("sale & rent");
+  const { t } = useUiSettings();
 
   useEffect(() => {
     console.log("filterFromParameter:", filterFromParameter);
@@ -78,7 +80,7 @@ export default function FilteringBar({
   return (
     <>
       {open && (
-        <section className=" lg:hidden w-full h-full z-20  p-4 bg-white border border-gray-200 rounded shadow-sm">
+        <section className="z-20 h-full w-full rounded border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 lg:hidden">
           <div className="flex flex-col gap-4">
             {/* Rent or Sale Buttons for small and medium size divices */}
             <div className="flex items-center gap-4">
@@ -97,11 +99,11 @@ export default function FilteringBar({
                 }}
                 className={`px-4 py-2 rounded border font-semibold w-full ${
                   rentSaleButton === "rent" || rentSaleButton === "sale & rent"
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-800 border-gray-300"
+                    ? "border-blue-600 bg-blue-600 text-white"
+                    : "border-slate-300 bg-white text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                 }`}
               >
-                Rent
+                {t("filters.rent")}
               </button>
 
               <button
@@ -119,20 +121,20 @@ export default function FilteringBar({
                 }}
                 className={`px-4 py-2 rounded border font-semibold w-full ${
                   rentSaleButton === "sale" || rentSaleButton === "sale & rent"
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-800 border-gray-300"
+                    ? "border-blue-600 bg-blue-600 text-white"
+                    : "border-slate-300 bg-white text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                 }`}
               >
-                Sale
+                {t("filters.sale")}
               </button>
             </div>
 
             {/* State Filter for small and medium size divices*/}
             <Select onValueChange={(value) => handleSearch({ state: value })}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a state" />
+                <SelectValue placeholder={t("filters.selectState")} />
               </SelectTrigger>
-              <SelectContent className="bg-white text-black">
+              <SelectContent className="bg-white text-black dark:bg-slate-900 dark:text-slate-100">
                 {[
                   "Alabama",
                   "Alaska",
@@ -194,18 +196,18 @@ export default function FilteringBar({
             {/* Price Filter for small and medium size divices*/}
             <Select onValueChange={(value) => handleSearch({ price: value })}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Price" />
+                <SelectValue placeholder={t("filters.price")} />
               </SelectTrigger>
-              <SelectContent className="bg-white text-black">
-                <SelectItem value="0">all Prices</SelectItem>
-                <SelectItem value="[0,75000]">Below 75k</SelectItem>
-                <SelectItem value="[75000,100000]">75k-100k</SelectItem>
-                <SelectItem value="[100000,200000]">100k-200k</SelectItem>
-                <SelectItem value="[200000,500000]">200k-500k</SelectItem>
-                <SelectItem value="[500000,1000000]">500k-1M</SelectItem>
-                <SelectItem value="[1000000,3000000]">1M-3M</SelectItem>
+              <SelectContent className="bg-white text-black dark:bg-slate-900 dark:text-slate-100">
+                <SelectItem value="0">{t("filters.allPrices")}</SelectItem>
+                <SelectItem value="[0,75000]">{t("filters.below75k")}</SelectItem>
+                <SelectItem value="[75000,100000]">{t("filters.between75And100k")}</SelectItem>
+                <SelectItem value="[100000,200000]">{t("filters.between100And200k")}</SelectItem>
+                <SelectItem value="[200000,500000]">{t("filters.between200And500k")}</SelectItem>
+                <SelectItem value="[500000,1000000]">{t("filters.between500kAnd1m")}</SelectItem>
+                <SelectItem value="[1000000,3000000]">{t("filters.between1mAnd3m")}</SelectItem>
                 <SelectItem value="[3000000,99999999999999]">
-                  Above 3M
+                  {t("filters.above3m")}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -213,10 +215,10 @@ export default function FilteringBar({
             {/* Type Filter for small and medium size divices*/}
             <Select onValueChange={(value) => handleSearch({ type: value })}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Type" />
+                <SelectValue placeholder={t("filters.type")} />
               </SelectTrigger>
-              <SelectContent className="bg-white text-black">
-                <SelectItem value="0">all Types</SelectItem>
+              <SelectContent className="bg-white text-black dark:bg-slate-900 dark:text-slate-100">
+                <SelectItem value="0">{t("filters.allTypes")}</SelectItem>
                 <SelectItem value="Apartment">Apartment</SelectItem>
                 <SelectItem value="House">House</SelectItem>
                 <SelectItem value="Villa">Villa</SelectItem>
@@ -227,13 +229,13 @@ export default function FilteringBar({
             {/* Order Filter for small and medium size divices*/}
             <Select onValueChange={(value) => handleSearch({ order: value })}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Order by" />
+                <SelectValue placeholder={t("filters.orderBy")} />
               </SelectTrigger>
-              <SelectContent className="bg-white text-black">
-                <SelectItem value="Newest">Newest</SelectItem>
-                <SelectItem value="Oldest">Oldest</SelectItem>
-                <SelectItem value="HTL">Price: High to Low</SelectItem>
-                <SelectItem value="LTH">Price: Low to High</SelectItem>
+              <SelectContent className="bg-white text-black dark:bg-slate-900 dark:text-slate-100">
+                <SelectItem value="Newest">{t("filters.newest")}</SelectItem>
+                <SelectItem value="Oldest">{t("filters.oldest")}</SelectItem>
+                <SelectItem value="HTL">{t("filters.priceHighToLow")}</SelectItem>
+                <SelectItem value="LTH">{t("filters.priceLowToHigh")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -242,10 +244,10 @@ export default function FilteringBar({
       <section className=" w-[100%] flex justify-center">
         <div
           onClick={() => setopen(!open)}
-          className="flex lg:hidden h-[10%] w-[80%] flex-row gap-1 justify-center items-center  text-lg font-bold border-2 border-gray-400 rounded hover:bg-gray-200 hover:border-gray-200 hover:cursor-pointer "
+          className="flex h-[10%] w-[80%] flex-row items-center justify-center gap-1 rounded border-2 border-slate-400 text-lg font-bold hover:cursor-pointer hover:border-slate-200 hover:bg-slate-200 dark:border-slate-700 dark:hover:border-slate-700 dark:hover:bg-slate-800 lg:hidden"
         >
           <ListFilterIcon className="inline mr-2" />
-          <p>Filters</p>
+          <p>{t("filters.title")}</p>
         </div>
       </section>
       <section className="hidden lg:block">
@@ -255,22 +257,22 @@ export default function FilteringBar({
             onValueChange={(value) => handleSearch({ rent_or_sale: value })}
           >
             <SelectTrigger className="w-fit px-6 gap-4 font-bold rounded">
-              <SelectValue placeholder="Rent or Sell" />
+              <SelectValue placeholder={t("filters.rentOrSell")} />
             </SelectTrigger>
-            <SelectContent className="bg-white text-black">
-              <SelectItem value="0">rent & salle</SelectItem>
+            <SelectContent className="bg-white text-black dark:bg-slate-900 dark:text-slate-100">
+              <SelectItem value="0">{t("filters.rentAndSale")}</SelectItem>
 
-              <SelectItem value="rent">Rent</SelectItem>
-              <SelectItem value="sale">Sale</SelectItem>
+              <SelectItem value="rent">{t("filters.rent")}</SelectItem>
+              <SelectItem value="sale">{t("filters.sale")}</SelectItem>
             </SelectContent>
           </Select>
           {/* State Filter */}
           <Select onValueChange={(value) => handleSearch({ state: value })}>
             <SelectTrigger className="w-fit px-6 gap-4 font-bold rounded">
-              <SelectValue placeholder="State" />
+              <SelectValue placeholder={t("filters.selectState")} />
             </SelectTrigger>
-            <SelectContent className="max-h-40 overflow-y-auto bg-white text-black">
-              <SelectItem value="0">all states</SelectItem>
+            <SelectContent className="max-h-40 overflow-y-auto bg-white text-black dark:bg-slate-900 dark:text-slate-100">
+              <SelectItem value="0">{t("filters.allStates")}</SelectItem>
               {[
                 "Alabama",
                 "Alaska",
@@ -332,27 +334,27 @@ export default function FilteringBar({
           {/* Price Filter for large size divices */}
           <Select onValueChange={(value) => handleSearch({ price: value })}>
             <SelectTrigger className="w-fit px-6 gap-4 font-bold rounded">
-              <SelectValue placeholder="Price" />
+              <SelectValue placeholder={t("filters.price")} />
             </SelectTrigger>
-            <SelectContent className="bg-white text-black">
-              <SelectItem value="0">all Prices</SelectItem>
+            <SelectContent className="bg-white text-black dark:bg-slate-900 dark:text-slate-100">
+              <SelectItem value="0">{t("filters.allPrices")}</SelectItem>
 
-              <SelectItem value="[0,75000]">Below 75k</SelectItem>
-              <SelectItem value="[75000,100000]">75k-100k</SelectItem>
-              <SelectItem value="[100000,200000]">100k-200k</SelectItem>
-              <SelectItem value="[200000,500000]">200k-500k</SelectItem>
-              <SelectItem value="[500000,1000000]">500k-1M</SelectItem>
-              <SelectItem value="[1000000,3000000]">1M-3M</SelectItem>
-              <SelectItem value="[3000000,99999999999999]">Above 3M</SelectItem>
+              <SelectItem value="[0,75000]">{t("filters.below75k")}</SelectItem>
+              <SelectItem value="[75000,100000]">{t("filters.between75And100k")}</SelectItem>
+              <SelectItem value="[100000,200000]">{t("filters.between100And200k")}</SelectItem>
+              <SelectItem value="[200000,500000]">{t("filters.between200And500k")}</SelectItem>
+              <SelectItem value="[500000,1000000]">{t("filters.between500kAnd1m")}</SelectItem>
+              <SelectItem value="[1000000,3000000]">{t("filters.between1mAnd3m")}</SelectItem>
+              <SelectItem value="[3000000,99999999999999]">{t("filters.above3m")}</SelectItem>
             </SelectContent>
           </Select>
           {/* Type Filter for large size divices */}
           <Select onValueChange={(value) => handleSearch({ type: value })}>
             <SelectTrigger className="w-fit px-6 gap-4 font-bold rounded">
-              <SelectValue placeholder="Type" />
+              <SelectValue placeholder={t("filters.type")} />
             </SelectTrigger>
-            <SelectContent className="bg-white text-black">
-              <SelectItem value="0">all Types</SelectItem>
+            <SelectContent className="bg-white text-black dark:bg-slate-900 dark:text-slate-100">
+              <SelectItem value="0">{t("filters.allTypes")}</SelectItem>
 
               <SelectItem value="Apartment">Apartment</SelectItem>
               <SelectItem value="House">House</SelectItem>
@@ -363,13 +365,13 @@ export default function FilteringBar({
           {/* Order Filter for large size divices */}
           <Select onValueChange={(value) => handleSearch({ order: value })}>
             <SelectTrigger className="w-fit px-6 gap-4 font-bold rounded">
-              <SelectValue placeholder="Order by" />
+              <SelectValue placeholder={t("filters.orderBy")} />
             </SelectTrigger>
-            <SelectContent className="bg-white text-black">
-              <SelectItem value="Newest">Newest</SelectItem>
-              <SelectItem value="Oldest">Oldest</SelectItem>
-              <SelectItem value="HTL">Price: High to Low</SelectItem>
-              <SelectItem value="LTH">Price: Low to High</SelectItem>
+            <SelectContent className="bg-white text-black dark:bg-slate-900 dark:text-slate-100">
+              <SelectItem value="Newest">{t("filters.newest")}</SelectItem>
+              <SelectItem value="Oldest">{t("filters.oldest")}</SelectItem>
+              <SelectItem value="HTL">{t("filters.priceHighToLow")}</SelectItem>
+              <SelectItem value="LTH">{t("filters.priceLowToHigh")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
