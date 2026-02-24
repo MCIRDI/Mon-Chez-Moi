@@ -10,6 +10,7 @@ import {
   Layers,
   Expand,
   Check,
+  Copy,
   MoreVertical,
 } from "lucide-react";
 import {
@@ -45,6 +46,7 @@ export default function Property() {
     space: number;
     state: string;
     type: string;
+    phone_number: string | null;
     photo1: string | null;
     photo2: string | null;
     photo3: string | null;
@@ -83,6 +85,7 @@ export default function Property() {
 
   const [property, setProperty] = useState<PropertyType | null>(null);
   const [liked, setLiked] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">("idle");
   const [showGallery, setShowGallery] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const dropdownRef = useRef(null);
@@ -111,6 +114,26 @@ export default function Property() {
         "/images/MonChezMoi01.jpg",
       )
     : mainPhotoUrl;
+
+  const phoneNumber = property?.phone_number?.trim() || "N/A";
+  const canCopyPhone = Boolean(property?.phone_number?.trim());
+
+  const handleCopyPhone = async () => {
+    const value = property?.phone_number?.trim();
+    if (!value) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopyStatus("copied");
+      window.setTimeout(() => setCopyStatus("idle"), 1600);
+    } catch (error) {
+      console.error("Failed to copy phone number:", error);
+      setCopyStatus("error");
+      window.setTimeout(() => setCopyStatus("idle"), 2200);
+    }
+  };
 
   const setAuthForms = useOutletContext<
     React.Dispatch<React.SetStateAction<boolean>> | undefined
@@ -414,11 +437,11 @@ export default function Property() {
           </div>
           <div className="flex flex-col md:flex-row justify-between">
             <div>
-              <p className="font-bold text-3xl text-gray-800">
+              <p className="font-bold text-3xl text-slate-900 dark:text-slate-100">
                 {property.type.charAt(0).toUpperCase() + property.type.slice(1)}{" "}
                 for {property.rent_or_sale}
               </p>
-              <p>
+              <p className="text-slate-700 dark:text-slate-300">
                 {" "}
                 {property.exact_address.charAt(0).toUpperCase() +
                   property.exact_address.slice(1)}
@@ -429,11 +452,27 @@ export default function Property() {
                 {property.state.charAt(0).toUpperCase() +
                   property.state.slice(1)}
               </p>
-              <div className="flex gap-2 items-center">
-                <Phone className=" text-green-500" /> <p>06751505</p>
+              <div className="flex flex-wrap items-center gap-2 text-slate-800 dark:text-slate-200">
+                <Phone className="text-green-500" />
+                <p className="font-medium">{phoneNumber}</p>
+                {canCopyPhone && (
+                  <button
+                    type="button"
+                    onClick={handleCopyPhone}
+                    className="inline-flex items-center gap-1 rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+                  >
+                    <Copy size={14} />
+                    {copyStatus === "copied" ? "Copied" : "Copy"}
+                  </button>
+                )}
+                {copyStatus === "error" && (
+                  <span className="text-xs text-red-600 dark:text-red-400">
+                    Copy failed
+                  </span>
+                )}
               </div>
             </div>
-            <p className="text-green-900 text-2xl font-bold">
+            <p className="text-2xl font-bold text-green-700 dark:text-green-400">
               {"$" + property.price}
             </p>
           </div>

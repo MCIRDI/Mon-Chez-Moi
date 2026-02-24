@@ -30,6 +30,7 @@ class Property extends Model
         'state',
         'municipality',
         'exact_address',
+        'phone_number',
         'space',
         'number_rooms',
         'floor',

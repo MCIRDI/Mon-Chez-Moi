@@ -82,6 +82,7 @@ class PropertyController extends Controller
             'state' => 'State',
             'municipality' => 'Municipality',
             'exact_address' => 'Address',
+            'phone_number' => 'Phone Number',
             'number_rooms' => 'Number of Rooms',
             'space' => 'Space (m²)',
             'type' => 'Property Type',
@@ -102,11 +103,11 @@ class PropertyController extends Controller
         $message = str_replace([
             'photo1', 'photo2', 'photo3',
             'rent or sale', 'price', 'state', 'municipality',
-            'exact address', 'number rooms', 'space', 'type', 'floor', 'description'
+            'exact address', 'phone number', 'number rooms', 'space', 'type', 'floor', 'description'
         ], [
             'main photo', 'second photo', 'third photo',
             'rent or sale option', 'price', 'state', 'municipality',
-            'address', 'number of rooms', 'space', 'property type', 'floor', 'description'
+            'address', 'phone number', 'number of rooms', 'space', 'property type', 'floor', 'description'
         ], $message);
         
         // Add explicit size hint for upload/size-related photo errors.
@@ -166,21 +167,22 @@ public function store(Request $request)
 
         // Validate input including images
         $validatedData = $request->validate([
-            'photo1' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240', // principal (10MB)
-            'photo2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // secondary (10MB)
-            'photo3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // secondary (10MB)
+            'photo1' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'photo2' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'photo3' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
             'rent_or_sale' => ['required', Rule::in(['rent', 'sale'])],
             'price' => 'required|numeric|min:0',
             'state' => 'required|string|max:255',
             'municipality' => 'required|string|max:255',
             'exact_address' => 'required|string|max:500',
+            'phone_number' => ['required', 'string', 'max:30', 'regex:/^\+?[0-9\s\-\(\)]{7,20}$/'],
             'number_rooms' => 'required|integer|min:1',
             'space' => 'required|numeric|min:1',
             'type' => ['required', Rule::in(['House', 'Villa', 'Apartment', 'Shop'])],
-            'floor' => 'nullable|integer|min:0',
-            'description' => 'nullable|string|max:1000',
-            'features' => 'nullable|array',
-            'features.*' => 'string|max:30',
+            'floor' => 'required|integer|min:0',
+            'description' => 'required|string|max:1000',
+            'features' => 'required|array|min:1',
+            'features.*' => 'required|string|max:30',
         ], [
             'photo1.max' => 'The main photo must be 10MB or smaller.',
             'photo2.max' => 'The second photo must be 10MB or smaller.',
@@ -188,6 +190,9 @@ public function store(Request $request)
             'photo1.uploaded' => 'The main photo could not be uploaded. Please use a file up to 10MB.',
             'photo2.uploaded' => 'The second photo could not be uploaded. Please use a file up to 10MB.',
             'photo3.uploaded' => 'The third photo could not be uploaded. Please use a file up to 10MB.',
+            'phone_number.regex' => 'The phone number format is invalid.',
+            'features.required' => 'At least one feature is required.',
+            'features.min' => 'At least one feature is required.',
         ]);
 
         // Save uploaded images to storage and keep DB backup copies.
@@ -309,13 +314,14 @@ public function store(Request $request)
                   'state' => 'required|string|max:255',
                   'municipality' => 'required|string|max:255',
                   'exact_address' => 'required|string|max:500',
+                  'phone_number' => ['required', 'string', 'max:30', 'regex:/^\+?[0-9\s\-\(\)]{7,20}$/'],
                   'number_rooms' => 'required|integer|min:1',
                   'space' => 'required|numeric|min:1',
                   'type' => ['required', Rule::in(['House', 'Villa', 'Apartment', 'Shop'])],
-                  'floor' => 'nullable|integer|min:0',
-                  'description' => 'nullable|string|max:1000',
-                  'features' => 'nullable|array',
-                  'features.*' => 'string|max:30', // Each item in the array must be a string of max 255 characters
+                  'floor' => 'required|integer|min:0',
+                  'description' => 'required|string|max:1000',
+                  'features' => 'required|array|min:1',
+                  'features.*' => 'required|string|max:30',
               ], [
                   'photo1.max' => 'The main photo must be 10MB or smaller.',
                   'photo2.max' => 'The second photo must be 10MB or smaller.',
@@ -323,6 +329,9 @@ public function store(Request $request)
                   'photo1.uploaded' => 'The main photo could not be uploaded. Please use a file up to 10MB.',
                   'photo2.uploaded' => 'The second photo could not be uploaded. Please use a file up to 10MB.',
                   'photo3.uploaded' => 'The third photo could not be uploaded. Please use a file up to 10MB.',
+                  'phone_number.regex' => 'The phone number format is invalid.',
+                  'features.required' => 'At least one feature is required.',
+                  'features.min' => 'At least one feature is required.',
               ]);
           $property= Property::find($id);
            if(! $property){
@@ -336,6 +345,20 @@ public function store(Request $request)
                 'message' => 'You are not authorized to update this property',
             ], 403); // 403 Forbidden
            }
+
+        $missingPhotoErrors = [];
+        foreach ($this->photoSlots as $photoSlot) {
+            $hasNewUpload = $request->hasFile($photoSlot);
+            $hasExistingPhoto = !empty($property->{$photoSlot}) || !empty($property->{"{$photoSlot}_data"});
+
+            if (!$hasNewUpload && !$hasExistingPhoto) {
+                $missingPhotoErrors[$photoSlot] = ['This field is required.'];
+            }
+        }
+
+        if (!empty($missingPhotoErrors)) {
+            throw ValidationException::withMessages($missingPhotoErrors);
+        }
 
         // Save uploaded images to storage and keep DB backup copies.
         $this->persistUploadedPhotos($validatedData, $request);

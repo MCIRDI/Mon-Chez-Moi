@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Image as ImageIcon, X } from "lucide-react";
 import LoadingSpinner from "@/ui/LoadingSpinner";
 import ErrorDisplay from "@/ui/ErrorDisplay";
+import { resolvePropertyPhotoUrl } from "@/lib/media";
 
 interface PropertyFormData {
   rent_or_sale: "rent" | "sale" | "";
@@ -11,12 +12,32 @@ interface PropertyFormData {
   state: string;
   municipality: string;
   exact_address: string;
+  phone_number: string;
   number_rooms: number | "";
   space: number | "";
   type: "House" | "Villa" | "Apartment" | "Shop" | "";
   floor: number | "";
   description: string;
   features: string[];
+}
+
+interface PropertyApiResponse {
+  id: number;
+  rent_or_sale: "rent" | "sale";
+  price: number;
+  state: string;
+  municipality: string;
+  exact_address: string;
+  phone_number?: string | null;
+  number_rooms: number;
+  space: number;
+  type: "House" | "Villa" | "Apartment" | "Shop";
+  floor: number | null;
+  description: string | null;
+  features: string[] | null;
+  photo1: string | null;
+  photo2: string | null;
+  photo3: string | null;
 }
 
 const usaStates = [
@@ -95,12 +116,13 @@ export default function PropertyForm() {
     state: "",
     municipality: "",
     exact_address: "",
+    phone_number: "",
     number_rooms: "",
     space: "",
     type: "",
     floor: "",
     description: "",
-    features: [],
+    features: [""],
   });
 
   const [photos, setPhotos] = useState<Record<PhotoKey, File | null>>({
@@ -122,9 +144,38 @@ export default function PropertyForm() {
   // Fetch property if editing
   useEffect(() => {
     if (!id) return;
-    fatchPropertyById(Number(id)).then((data: PropertyFormData) => {
-      console.log("Fetched property data:", data);
-      setFormData(data);
+    fatchPropertyById(Number(id)).then((data: PropertyApiResponse) => {
+      const normalizedFeatures =
+        Array.isArray(data.features) && data.features.length > 0
+          ? data.features
+          : [""];
+
+      setFormData({
+        rent_or_sale: data.rent_or_sale ?? "",
+        price: data.price ?? "",
+        state: data.state ?? "",
+        municipality: data.municipality ?? "",
+        exact_address: data.exact_address ?? "",
+        phone_number: data.phone_number ?? "",
+        number_rooms: data.number_rooms ?? "",
+        space: data.space ?? "",
+        type: data.type ?? "",
+        floor: data.floor ?? "",
+        description: data.description ?? "",
+        features: normalizedFeatures,
+      });
+
+      setPreviews({
+        photo1: data.photo1
+          ? resolvePropertyPhotoUrl(data.id, "photo1", data.photo1, "")
+          : null,
+        photo2: data.photo2
+          ? resolvePropertyPhotoUrl(data.id, "photo2", data.photo2, "")
+          : null,
+        photo3: data.photo3
+          ? resolvePropertyPhotoUrl(data.id, "photo3", data.photo3, "")
+          : null,
+      });
     });
   }, [id]);
 
@@ -180,6 +231,10 @@ export default function PropertyForm() {
   const removePhoto = (key: PhotoKey) => {
     setPhotos((prev) => ({ ...prev, [key]: null }));
     setPreviews((prev) => ({ ...prev, [key]: null }));
+    const photoInput = document.getElementById(key) as HTMLInputElement | null;
+    if (photoInput) {
+      photoInput.value = "";
+    }
   };
 
   const addFeature = () =>
@@ -192,13 +247,43 @@ export default function PropertyForm() {
   };
 
   const removeFeature = (i: number) =>
-    setFormData((prev) => ({
-      ...prev,
-      features: prev.features.filter((_, idx) => idx !== i),
-    }));
+    setFormData((prev) => {
+      const nextFeatures = prev.features.filter((_, idx) => idx !== i);
+      return {
+        ...prev,
+        features: nextFeatures.length > 0 ? nextFeatures : [""],
+      };
+    });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const normalizedFeatures = formData.features
+      .map((feature) => feature.trim())
+      .filter((feature) => feature.length > 0);
+    const missingPhotoKeys = (["photo1", "photo2", "photo3"] as PhotoKey[]).filter(
+      (key) => !photos[key] && !previews[key],
+    );
+
+    if (normalizedFeatures.length === 0) {
+      setValidationErrors([
+        { field: "Features", message: "At least one feature is required." },
+      ]);
+      setConfirmationMessage("");
+      return;
+    }
+
+    if (missingPhotoKeys.length > 0) {
+      setValidationErrors(
+        missingPhotoKeys.map((key) => ({
+          field: photoLabels[key],
+          message: "This field is required.",
+        })),
+      );
+      setConfirmationMessage("");
+      return;
+    }
+
     setIsSubmitting(true);
 
     console.log("Current formData before submission:", formData);
@@ -209,9 +294,7 @@ export default function PropertyForm() {
     Object.entries(formData).forEach(([key, value]) => {
       console.log(`Processing field: ${key}, value:`, value);
       if (key === "features") {
-        // Filter out empty features and append as array
-        const validFeatures = (value as string[]).filter(f => f.trim() !== "");
-        validFeatures.forEach((f: string, i: number) =>
+        normalizedFeatures.forEach((f: string, i: number) =>
           form.append(`features[${i}]`, f),
         );
       } else {
@@ -343,10 +426,10 @@ export default function PropertyForm() {
         />
 
         <select
+          name="state"
           value={formData.state}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, state: e.target.value }))
-          }
+          onChange={handleChange}
+          required
           className={fieldClassName}
         >
           <option value="">Select State</option>
@@ -360,6 +443,7 @@ export default function PropertyForm() {
         {[
           "municipality",
           "exact_address",
+          "phone_number",
           "number_rooms",
           "space",
           "floor",
@@ -369,10 +453,15 @@ export default function PropertyForm() {
             name={f}
             value={formData[f as keyof PropertyFormData]}
             onChange={handleChange}
-            placeholder={f.replace("_", " ")}
+            placeholder={f.replace(/_/g, " ")}
             type={
-              ["number_rooms", "space", "floor"].includes(f) ? "number" : "text"
+              ["number_rooms", "space", "floor"].includes(f)
+                ? "number"
+                : f === "phone_number"
+                  ? "tel"
+                  : "text"
             }
+            pattern={f === "phone_number" ? "^\\+?[0-9\\s\\-()]{7,20}$" : undefined}
             className={fieldClassName}
             required
           />
@@ -397,6 +486,7 @@ export default function PropertyForm() {
           value={formData.description}
           onChange={handleChange}
           placeholder="Description"
+          required
           className={fieldClassName}
         />
 
@@ -441,6 +531,7 @@ export default function PropertyForm() {
                   type="file"
                   accept="image/*"
                   onChange={handlePhotoChange}
+                  required={!previews[key]}
                   hidden
                 />
               </label>
@@ -454,6 +545,8 @@ export default function PropertyForm() {
             <input
               value={f}
               onChange={(e) => updateFeature(i, e.target.value)}
+              placeholder="Feature"
+              required
               className={`flex-1 ${fieldClassName}`}
             />
             <button
