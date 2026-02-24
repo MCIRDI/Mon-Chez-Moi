@@ -45,7 +45,7 @@ services:
       - key: RESEND_KEY
         sync: false
       - key: MAIL_FROM_ADDRESS
-        value: mcirdiabdallah02@gmail.com
+        value: onboarding@resend.dev
       - key: MAIL_FROM_NAME
         value: "Mon Chez Moi"
       - key: AUTH_PASSWORD_BROKER
@@ -123,7 +123,7 @@ services:
       - key: RESEND_KEY
         sync: false
       - key: MAIL_FROM_ADDRESS
-        value: mcirdiabdallah02@gmail.com
+        value: onboarding@resend.dev
       - key: MAIL_FROM_NAME
         value: "Mon Chez Moi"
       - key: AUTH_PASSWORD_BROKER
