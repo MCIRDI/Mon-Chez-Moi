@@ -17,6 +17,9 @@ echo "DB_USERNAME: ${DB_USERNAME:-NOT_SET}"
 echo "DB_PASSWORD: ${DB_PASSWORD:+SET}"
 echo "REDIS_HOST: ${REDIS_HOST:-NOT_SET}"
 echo "REDIS_PORT: ${REDIS_PORT:-NOT_SET}"
+echo "MAIL_MAILER: ${MAIL_MAILER:-NOT_SET}"
+echo "MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-NOT_SET}"
+echo "RESEND_KEY: ${RESEND_KEY:+SET}"
 echo "=================================="
 
 # Set up environment variables for Laravel
@@ -42,12 +45,21 @@ REDIS_HOST="${REDIS_HOST}"
 REDIS_PORT="${REDIS_PORT}"
 REDIS_PASSWORD="${REDIS_PASSWORD}"
 QUEUE_CONNECTION="${QUEUE_CONNECTION:-database}"
+MAIL_MAILER="${MAIL_MAILER:-log}"
+MAIL_HOST="${MAIL_HOST}"
+MAIL_PORT="${MAIL_PORT}"
+MAIL_ENCRYPTION="${MAIL_ENCRYPTION}"
+MAIL_USERNAME="${MAIL_USERNAME}"
+MAIL_PASSWORD="${MAIL_PASSWORD}"
+MAIL_FROM_ADDRESS="${MAIL_FROM_ADDRESS}"
+MAIL_FROM_NAME="${MAIL_FROM_NAME:-Mon Chez Moi}"
+RESEND_KEY="${RESEND_KEY}"
+AUTH_PASSWORD_BROKER="${AUTH_PASSWORD_BROKER:-users}"
+AUTH_PASSWORD_RESET_TOKEN_TABLE="${AUTH_PASSWORD_RESET_TOKEN_TABLE:-password_reset_tokens}"
+AUTH_PASSWORDS_USERS_EXPIRE="${AUTH_PASSWORDS_USERS_EXPIRE:-60}"
 EOF
 
-# Debug: Show generated .env file
-echo "=== DEBUG: Generated .env file ==="
-cat /var/www/html/.env
-echo "================================="
+# Avoid printing .env to logs because it contains secrets.
 
 # Clear all Laravel caches to ensure fresh environment loading
 echo "=== Clearing Laravel caches ==="

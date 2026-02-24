@@ -41,19 +41,17 @@ services:
       - key: QUEUE_CONNECTION
         value: database
       - key: MAIL_MAILER
-        value: smtp
-      - key: MAIL_HOST
-        value: smtp.gmail.com
-      - key: MAIL_PORT
-        value: 587
-      - key: MAIL_ENCRYPTION
-        value: tls
+        value: resend
+      - key: RESEND_KEY
+        sync: false
       - key: MAIL_FROM_ADDRESS
-        value: noreply@monchezmoi.com
+        value: mcirdiabdallah02@gmail.com
       - key: MAIL_FROM_NAME
         value: "Mon Chez Moi"
       - key: AUTH_PASSWORD_BROKER
         value: users
+      - key: AUTH_PASSWORD_RESET_TOKEN_TABLE
+        value: password_reset_tokens
       - key: AUTH_PASSWORDS_USERS_EXPIRE
         value: 60
 
@@ -120,3 +118,17 @@ services:
         value: ${redis.PORT}
       - key: REDIS_PASSWORD
         value: ${redis.PASSWORD}
+      - key: MAIL_MAILER
+        value: resend
+      - key: RESEND_KEY
+        sync: false
+      - key: MAIL_FROM_ADDRESS
+        value: mcirdiabdallah02@gmail.com
+      - key: MAIL_FROM_NAME
+        value: "Mon Chez Moi"
+      - key: AUTH_PASSWORD_BROKER
+        value: users
+      - key: AUTH_PASSWORD_RESET_TOKEN_TABLE
+        value: password_reset_tokens
+      - key: AUTH_PASSWORDS_USERS_EXPIRE
+        value: 60
