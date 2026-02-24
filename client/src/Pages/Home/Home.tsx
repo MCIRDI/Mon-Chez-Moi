@@ -227,13 +227,13 @@ export default function Home() {
           onClick={() => {
             navigate("Search/buy");
           }}
-          className="card card-buy group"
+          className="relative card bg-[#66BB6A]     group"
         >
           <h1>{t("home.buyTitle")}</h1>
           <p>
             {t("home.buyDescription")}
           </p>
-          <div className="card-cta">
+          <div className="absolute inset-x-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-black text-center py-2 ">
             {t("home.buyCta")} &gt;
           </div>
         </div>
@@ -242,26 +242,26 @@ export default function Home() {
           onClick={() => {
             navigate("Search/rent");
           }}
-          className="card card-rent group"
+          className="relative card bg-black text-white  group"
         >
           <h1>{t("home.rentTitle")}</h1>
           <p>
             {t("home.rentDescription")}
           </p>
-          <div className="card-cta">
+          <div className="absolute inset-x-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-center py-2 ">
             {t("home.rentCta")} &gt;
           </div>
         </div>
 
         <div
           onClick={() => navigate("/Myproperties")}
-          className="card card-my-properties group"
+          className="relative card bg-[#CE93D8]   group"
         >
           <h1>{t("home.myPropertiesTitle")}</h1>
           <p>
             {t("home.myPropertiesDescription")}
           </p>
-          <div className="card-cta">
+          <div className="absolute inset-x-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-black text-center py-2 ">
             {t("home.myPropertiesCta")} &gt;
           </div>
         </div>

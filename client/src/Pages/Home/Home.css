@@ -8,36 +8,14 @@
   @apply p-1 bg-white rounded w-fit bg-white/50 text-gray-700 text-left;
 }
 .card {
-  @apply relative h-[40vh] w-[80vw] md:h-[370px] md:w-[40vw] lg:w-[30vw] p-4 md:p-5 flex flex-col items-center rounded-2xl border border-white/25 shadow-lg overflow-hidden transition-all duration-300;
+  @apply h-[40vh] w-[80vw] md:h-[370px] md:w-[40vw] lg:w-[30vw] p-3 flex flex-col items-center rounded-xl;
 }
 .card:hover {
-  @apply cursor-pointer -translate-y-1 scale-[1.01] shadow-2xl;
+  @apply cursor-pointer transition-all duration-1000 hover:brightness-125 hover:scale-105;
 }
 .card h1 {
   @apply font-bold text-3xl underline text-center;
 }
 .card p {
-  @apply text-center py-3 md:py-4 max-w-[32ch];
-}
-.card-cta {
-  @apply absolute inset-x-0 bottom-0 text-center py-3 font-semibold tracking-wide opacity-0 translate-y-2 transition-all duration-300;
-}
-.card:hover .card-cta {
-  @apply opacity-100 translate-y-0;
-}
-.card-buy {
-  @apply bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 text-white;
-}
-.card-rent {
-  @apply bg-gradient-to-br from-indigo-700 via-blue-700 to-slate-900 text-white;
-}
-.card-my-properties {
-  @apply bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 text-slate-900;
-}
-.card-buy .card-cta,
-.card-rent .card-cta {
-  @apply bg-black/20 text-white;
-}
-.card-my-properties .card-cta {
-  @apply bg-white/30 text-slate-900;
+  @apply text-center py-3;
 }
