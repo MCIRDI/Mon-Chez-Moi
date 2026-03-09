@@ -15,3 +15,9 @@ The API is accessible at: `/api/*`
 - PHP 8.2+
 - Laravel 11
 - MySQL Database
+
+## Hostinger SSH Deploy
+Run this from the project root on the Hostinger server:
+```bash
+bash deploy-hostinger.sh
+```
