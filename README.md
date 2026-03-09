@@ -3,8 +3,8 @@
 This is the backend API server for Mon Chez Moi, deployed on Hostinger.
 
 ## Deployment Structure
-- `composer.json` - Root level for Hostinger detection
-- `composer.lock` - Locked dependency versions
+- `composer.json` - Root level for Hostinger deployment detection
+- `server/composer.lock` - Locked backend dependency versions
 - `.htaccess` - Redirects traffic to `server/public/`
 - `server/` - Laravel application directory
 
