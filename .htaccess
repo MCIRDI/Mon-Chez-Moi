@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Redirect all requests to the server/public directory
+    RewriteRule ^(.*)$ server/public/$1 [L]
+</IfModule>
+
+# Prevent access to sensitive directories
+<IfModule mod_authz_core.c>
+    <RequireAll>
+        Require all granted
+    </RequireAll>
+</IfModule>
+
+# Block access to .env files
+<Files ~ "^\.env">
+    Order allow,deny
+    Deny from all
+</Files>
